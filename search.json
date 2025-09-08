@@ -65,14 +65,25 @@
     ]
   },
   {
-    "objectID": "src/ica/ica-README.html",
-    "href": "src/ica/ica-README.html",
-    "title": "In-Class Activities",
+    "objectID": "src/ica/cleaning.html",
+    "href": "src/ica/cleaning.html",
+    "title": "Cleaning SFO Weather Data",
     "section": "",
-    "text": "This section contains in-class activities.",
+    "text": "Exercise\nCarryout the following steps to clean and save the San Francisco Weather data. Make sure to download and add the data file to your portfolio repository as instructed.\nCodelibrary(tidyverse)\nCode my_data &lt;- read.csv(\"/Users/raouda/Documents/GitHub/portfolio-RaoudaBK/src/ica/weather.csv\")\nCodeclean_data &lt;- my_data |&gt;\n  mutate(PrecipYr = na_if(PrecipYr, 99999))\nCodeweather_clean &lt;- clean_data |&gt; \n    arrange(Month, Day) |&gt; \n    mutate(dateInYear = 1:365)\nCodeweather_clean |&gt; \n  mutate(month_name = month.abb[Month]) |&gt; \n  head()\n\n  Month Day Low High NormalLow NormalHigh RecordLow LowYr RecordHigh HiYear\n1     1   1  47   52        44         56        31  1965         68   1996\n2     1   2  48   51        44         56        29  1960         69   1996\n3     1   3  45   53        44         56        31  1950         69   2000\n4     1   4  39   53        44         56        29  1949         62   2006\n5     1   5  38   55        44         56        26  1949         65   1986\n6     1   6  37   52        44         56        29  1950         66   2003\n  Precip RecordPrecip PrecipYr   date Record RecordText RecordP CulmPrec\n1   0.09         2.16     2004 1/1/11  FALSE       &lt;NA&gt;   FALSE     0.09\n2   0.35         1.67     1977 1/2/11  FALSE       &lt;NA&gt;   FALSE     0.44\n3   0.00         1.33     1974 1/3/11  FALSE       &lt;NA&gt;   FALSE     0.44\n4   0.00         5.59     1982 1/4/11  FALSE       &lt;NA&gt;   FALSE     0.44\n5   0.00         1.98     1959 1/5/11  FALSE       &lt;NA&gt;   FALSE     0.44\n6   0.00         2.34     1993 1/6/11  FALSE       &lt;NA&gt;   FALSE     0.44\n  dateInYear month_name\n1          1        Jan\n2          2        Jan\n3          3        Jan\n4          4        Jan\n5          5        Jan\n6          6        Jan",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>In-Class Activities</span>"
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Cleaning SFO Weather Data</span>"
+    ]
+  },
+  {
+    "objectID": "src/ica/cleaning.html#exercise",
+    "href": "src/ica/cleaning.html#exercise",
+    "title": "Cleaning SFO Weather Data",
+    "section": "",
+    "text": "Read in the weather data in this file with the correct relative file path after you move it to the instructed location.\nThere is a variable that has values that don’t make sense in the data context. Figure out which variable this is and clean it up by making those values missing using na_if().\nCreate a variable called dateInYear that indicates the day of the year (1-365) for each case. (Jan 1 should be 1, and Dec 31 should be 365).\nCreate a variable called month_name that shows the 3-letter abbreviation for each case.\nSave the wrangled data to the data/processed/ folder using write_csv(). Name this file weather_clean.csv. Look up the documentation for this function by typing ?write_csv in the Console. You’ll need to write an appropriate relative path.",
+    "crumbs": [
+      "In-Class Activities",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Cleaning SFO Weather Data</span>"
     ]
   },
   {
