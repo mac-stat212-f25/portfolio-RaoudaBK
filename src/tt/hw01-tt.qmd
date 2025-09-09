@@ -17,9 +17,10 @@ For this homework I used the rank_by_year dataset from the Henley Passport Index
 library(readr) 
 library(tidyverse)
 ```
+
 ```{r}
 #load my data
-rank_by_year  <- read_csv("/Users/raouda/Downloads/Data Science 212/Homework/rank_by_year.csv")
+rank_by_year  <- read_csv("/Users/raouda/Documents/GitHub/portfolio-RaoudaBK/src/tt/Data/rank_by_year.csv")
 ```
 
 ### Research Question
@@ -52,7 +53,7 @@ ggplot(region, aes(x = year, y = avg_visa_free, color = region)) +
 
 The line chart shows that over the years, the number of visa-free destinations generally increases. From around 2010 to 2025, there is a clear upward trend, although some regions experience occasional fluctuations, with certain years showing increases for some countries and decreases for others. Interestingly, in the dataset I was given, the years 2007 and 2009 show 0 for all countries and regions. I’m not sure if this is because the data wasn’t collected or if there’s another reason, but it’s something I’d like to explore further.
 
-Looking at the overall trends, European countries consistently offer access to more than 150 destinations since 2017, making them the strongest passports. The Americas are generally in second place, followed by the Caribbean in third. However, by the end of 2017, it appears that Oceania’s passport mobility surpasses most Caribbean countries, and this continues until today. In contrast, African countries and the Middle East have much lower visa-free access, with Africa having fewer than 75 destinations even though there has been a slight increase compared to 2010.
+Looking at the overall trends, European countries consistently offer access to more than 150 destinations since 2017, making them the strongest passports. The Americas are generally in second place, followed by the Caribbean in third. However, by the end of 2022, it appears that Oceania’s passport mobility surpasses most Caribbean countries, and this continues until today. In contrast, African countries and the Middle East have much lower visa-free access, with Africa having fewer than 75 destinations even though there has been a slight increase compared to 2010.
 
 
 ### Conclusion & reflections
@@ -60,4 +61,4 @@ In conclusion, the data shows that Europe has the strongest passport access, fol
 
 The years 2007 and 2009 showing 0 for all regions is still unclear. This might be due to missing data or other factors—but it also makes me think about the importance of understanding data limitations when drawing conclusions.
 
-Overall, this homework helped me see how passport strength varies across regions and over time and it made me more aware of how travel freedom is not evenly distributed globally. In the future I would think about investigating the factors that influence changes in passport power over time, such as political relationships, trade agreements, or major events like the COVID-19 pandemic. It would also be interesting to look closer at the Caribbean and Oceania to understand why their mobility has increased relative to other regions.
+Overall, this homework helped me see how passport strength varies across regions and over time and it made me more aware of how travel freedom is not evenly distributed globally. In the future I would think about investigating the factors that influence changes in passport power over time, such as political relationships, trade agreements, or major events like the COVID-19 pandemic. It would also be interesting to look closer at the Caribbean and Oceania to understand why their mobility has increased relative to other regions.  
