@@ -43,6 +43,28 @@
     ]
   },
   {
+    "objectID": "src/tt/hw01-tt.html",
+    "href": "src/tt/hw01-tt.html",
+    "title": "Homework 01",
+    "section": "",
+    "text": "TidyTuesday Section\nExplore the week’s TidyTuesday challenge. Develop a research question, then answer it through a short data story with effective visualization(s). Provide sufficient background for readers to grasp your narrative.",
+    "crumbs": [
+      "TidyTuesday",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Homework 01</span>"
+    ]
+  },
+  {
+    "objectID": "src/tt/hw01-tt.html#tidytuesday-section",
+    "href": "src/tt/hw01-tt.html#tidytuesday-section",
+    "title": "Homework 01",
+    "section": "",
+    "text": "Data context\nFor this homework I used the rank_by_year dataset from the Henley Passport Index, which measures how many countries a passport holder can enter without a visa. I chose this dataset because passports are mor than just travel documents. They reflect freedom and global mobility. Since I come from a country with a weaker passport, I was especially interested in exploring how access to visa-free travel differs across the world.\n\nCode# Load my librairies\nlibrary(readr) \nlibrary(tidyverse)\n\n\n\nCode#load my data\nrank_by_year  &lt;- read_csv(\"/Users/raouda/Documents/GitHub/portfolio-RaoudaBK/src/tt/Data/rank_by_year.csv\")\n\n\nResearch Question\nMy question today is : Which regions of the world have the most access to visa-free countries and how has this changed over time?\nI chose this focus because it allows me to compare regions instead of only looking at one country and helps to reveal inequalities between parts of the world showing where people can travel more freely.\nData Visualization\n\nCode# average number of visa-free destinations for each region from 2006 to 2025\nregion &lt;- rank_by_year %&gt;%\n  group_by(region, year) %&gt;%\n  summarise(avg_visa_free = mean(visa_free_count, na.rm = TRUE)) %&gt;%\n  ungroup()\n\n# Illustrate the passport streng by region over the past 20 years\nggplot(region, aes(x = year, y = avg_visa_free, color = region)) +\n  geom_line() +\n  labs(\n    title = \"Average Visa-Free Access by Region (2006–2025)\",\n    x = \"Year\",\n    y = \"Average Number of Visa-Free Destinations\",\n    color = \"Region\") +\n  theme_minimal()\n\n\n\n\n\n\n\nData Analysis\nThe line chart shows that over the years, the number of visa-free destinations generally increases. From around 2010 to 2025, there is a clear upward trend, although some regions experience occasional fluctuations, with certain years showing increases for some countries and decreases for others. Interestingly, in the dataset I was given, the years 2007 and 2009 show 0 for all countries and regions. I’m not sure if this is because the data wasn’t collected or if there’s another reason, but it’s something I’d like to explore further.\nLooking at the overall trends, European countries consistently offer access to more than 150 destinations since 2017, making them the strongest passports. The Americas are generally in second place, followed by the Caribbean in third. However, by the end of 2022, it appears that Oceania’s passport mobility surpasses most Caribbean countries, and this continues until today. In contrast, African countries and the Middle East have much lower visa-free access, with Africa having fewer than 75 destinations even though there has been a slight increase compared to 2010.\nConclusion & reflections\nIn conclusion, the data shows that Europe has the strongest passport access, followed by the Americas, with the Caribbean and Oceania showing interesting shifts in mobility over time. Africa and the Middle East continue to have lower visa-free access, highlighting persistent global inequalities in travel freedom. I was somewhat surprised by Asia and that’s because while countries like Singapore and Japan have very strong passports, most Asian countries actually have relatively low mobility which I hadn’t expected. The Caribbean being third in mobility today also stood out to me, showing that smaller regions can sometimes have more freedom than larger ones.\nThe years 2007 and 2009 showing 0 for all regions is still unclear. This might be due to missing data or other factors—but it also makes me think about the importance of understanding data limitations when drawing conclusions.\nOverall, this homework helped me see how passport strength varies across regions and over time and it made me more aware of how travel freedom is not evenly distributed globally. In the future I would think about investigating the factors that influence changes in passport power over time, such as political relationships, trade agreements, or major events like the COVID-19 pandemic. It would also be interesting to look closer at the Caribbean and Oceania to understand why their mobility has increased relative to other regions.",
+    "crumbs": [
+      "TidyTuesday",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Homework 01</span>"
+    ]
+  },
+  {
     "objectID": "src/ica/ica-sample1.html",
     "href": "src/ica/ica-sample1.html",
     "title": "ICA Sample 1",
@@ -50,7 +72,7 @@
     "text": "Add content here",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>4</span>  <span class='chapter-title'>ICA Sample 1</span>"
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>ICA Sample 1</span>"
     ]
   },
   {
@@ -61,7 +83,7 @@
     "text": "Add content here",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>ICA Sample 2</span>"
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>ICA Sample 2</span>"
     ]
   },
   {
@@ -72,7 +94,7 @@
     "text": "Exercise\nCarryout the following steps to clean and save the San Francisco Weather data. Make sure to download and add the data file to your portfolio repository as instructed.\nCodelibrary(tidyverse)\nCode my_data &lt;- read.csv(\"/Users/raouda/Documents/GitHub/portfolio-RaoudaBK/src/ica/weather.csv\")\nCodeclean_data &lt;- my_data |&gt;\n  mutate(PrecipYr = na_if(PrecipYr, 99999))\nCodeweather_clean &lt;- clean_data |&gt; \n    arrange(Month, Day) |&gt; \n    mutate(dateInYear = 1:365)\nCodeweather_clean |&gt; \n  mutate(month_name = month.abb[Month]) |&gt; \n  head()\n\n  Month Day Low High NormalLow NormalHigh RecordLow LowYr RecordHigh HiYear\n1     1   1  47   52        44         56        31  1965         68   1996\n2     1   2  48   51        44         56        29  1960         69   1996\n3     1   3  45   53        44         56        31  1950         69   2000\n4     1   4  39   53        44         56        29  1949         62   2006\n5     1   5  38   55        44         56        26  1949         65   1986\n6     1   6  37   52        44         56        29  1950         66   2003\n  Precip RecordPrecip PrecipYr   date Record RecordText RecordP CulmPrec\n1   0.09         2.16     2004 1/1/11  FALSE       &lt;NA&gt;   FALSE     0.09\n2   0.35         1.67     1977 1/2/11  FALSE       &lt;NA&gt;   FALSE     0.44\n3   0.00         1.33     1974 1/3/11  FALSE       &lt;NA&gt;   FALSE     0.44\n4   0.00         5.59     1982 1/4/11  FALSE       &lt;NA&gt;   FALSE     0.44\n5   0.00         1.98     1959 1/5/11  FALSE       &lt;NA&gt;   FALSE     0.44\n6   0.00         2.34     1993 1/6/11  FALSE       &lt;NA&gt;   FALSE     0.44\n  dateInYear month_name\n1          1        Jan\n2          2        Jan\n3          3        Jan\n4          4        Jan\n5          5        Jan\n6          6        Jan",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Cleaning SFO Weather Data</span>"
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Cleaning SFO Weather Data</span>"
     ]
   },
   {
@@ -83,7 +105,7 @@
     "text": "Read in the weather data in this file with the correct relative file path after you move it to the instructed location.\nThere is a variable that has values that don’t make sense in the data context. Figure out which variable this is and clean it up by making those values missing using na_if().\nCreate a variable called dateInYear that indicates the day of the year (1-365) for each case. (Jan 1 should be 1, and Dec 31 should be 365).\nCreate a variable called month_name that shows the 3-letter abbreviation for each case.\nSave the wrangled data to the data/processed/ folder using write_csv(). Name this file weather_clean.csv. Look up the documentation for this function by typing ?write_csv in the Console. You’ll need to write an appropriate relative path.",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Cleaning SFO Weather Data</span>"
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Cleaning SFO Weather Data</span>"
     ]
   },
   {
