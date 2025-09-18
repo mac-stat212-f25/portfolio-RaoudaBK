@@ -65,6 +65,116 @@
     ]
   },
   {
+    "objectID": "src/tt/Homework2/hw02-p1.html",
+    "href": "src/tt/Homework2/hw02-p1.html",
+    "title": "HW02-P1 Adv Data Viz",
+    "section": "",
+    "text": "Instructions\nUsing ggplot2 and other tools in R, recreate the original New York Times graphic to the greatest extent possible. Try to get as close as possible to the figure below:\nYou will need to use reference pages and documentation to discover necessary tools. For example, you may want to Google search “ggplot multiple plots”. When looking through results, check publication dates and use newer references. Some helpful resources could include R documentation, Stack Overflow, and R cheatsheets.\nRequirements\nBonus: If you’d like further practice, recreate the legend in the temperature graph that shows how the colored lines relate to record, normal, and actual highs.",
+    "crumbs": [
+      "TidyTuesday",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>HW02-P1 Adv Data Viz</span>"
+    ]
+  },
+  {
+    "objectID": "src/tt/Homework2/hw02-p1.html#instructions",
+    "href": "src/tt/Homework2/hw02-p1.html#instructions",
+    "title": "HW02-P1 Adv Data Viz",
+    "section": "",
+    "text": "Temperature graph\n\nBands for the record, normal, and actual highs and lows are shown in the correct colors.\nDownward triangles point to the record high temperatures above the red band.\nText displays the record high temperatures above the triangles.\nX-axis label: 3-letter month abbreviations appear in the middle of each month.\nY-axis label: Tick marks at 0, 40, 80, and 120 only.\nVertical lines separate the months.\nTitle of “Temperature” is included.\n\n\nPrecipitation\n\nTan area and blue line reflecting the monthly cumulative precipitation is included.\nText (number) for cumulative precipitation for each month is included at the end of each month just above the blue line.\nDownward triangles point to the record precipitation days.\nVertical lines separate the months.\nTitle of “Precipitation” is included.\n\n\nOverall\n\nBoth the temperature and precipitation graphs are in one figure.\nThe temperature plot takes up more vertical space than the precipitation plot.\nThe title “SFO weather in 2011” is present.\n\n\nResource reflection\n\nAt least 1 resource is listed\nAt least 3 sentences about resources and their helpfulness in the task",
+    "crumbs": [
+      "TidyTuesday",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>HW02-P1 Adv Data Viz</span>"
+    ]
+  },
+  {
+    "objectID": "src/tt/Homework2/hw02-p1.html#setup",
+    "href": "src/tt/Homework2/hw02-p1.html#setup",
+    "title": "HW02-P1 Adv Data Viz",
+    "section": "Setup",
+    "text": "Setup\n\nCode# Code for loading packages and reading in data\nlibrary(tidyverse)\nlibrary(lubridate)\nlibrary(patchwork)\nweather &lt;- read_csv(\"https://mac-stat.github.io/data/sfo_weather.csv\")",
+    "crumbs": [
+      "TidyTuesday",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>HW02-P1 Adv Data Viz</span>"
+    ]
+  },
+  {
+    "objectID": "src/tt/Homework2/hw02-p1.html#visualization",
+    "href": "src/tt/Homework2/hw02-p1.html#visualization",
+    "title": "HW02-P1 Adv Data Viz",
+    "section": "Visualization",
+    "text": "Visualization\n\nCode# Code for recreating the visualization\n# Use as many code chunks as you need to organize your work well\n\n# Temperature plot \ntemp_plot &lt;- ggplot(weather, aes(x = dateInYear)) +\n  # Record band (outer)\n  geom_ribbon(aes(ymin = RecordLow, ymax = RecordHigh), fill = \"#e6e0cf\") +\n  # Normal band\n  geom_ribbon(aes(ymin = NormalLow, ymax = NormalHigh), fill = \"#d9d3c3\") +\n  # Actual temps \n  geom_ribbon(aes(ymin = Low, ymax = High), fill = \"darkred\") +\n  \n  # Downward triangles\n  geom_point(\n    data = weather %&gt;% filter(High == RecordHigh),\n    aes(x = dateInYear, y = RecordHigh),\n    shape = 25, size = 1.5, fill = \"black\") +\n  \n  # Text labels\n  geom_text(\n    data = weather %&gt;% filter(High == RecordHigh),\n    aes(x = dateInYear, y = RecordHigh + 5, \n        label = paste(\"Record High\", RecordHigh, \"°F\")),\n    size = 1.5, vjust = 0) +\n  \n  # Vertical month lines\n  geom_vline(xintercept = seq(0, 365, by = 30), color = \"grey80\", linetype = \"dotted\") +\n  \n  # Axes & labels\n  scale_x_continuous(breaks = seq(15, 365, by = 30), labels = month.abb) +\n  scale_y_continuous(breaks = c(0, 40, 80, 120)) +\n  labs(title = \"Temperature\", y = \"Temperature (°F)\") +\n  theme_minimal()\n\n# Precipitation plot\nprecip_plot &lt;- ggplot(weather, aes(x = dateInYear)) +\n  geom_area(aes(y = CulmPrec), fill = \"#d9d3c3\") +\n  geom_line(aes(y = CulmPrec), color = \"blue\") +\n  \n  # Text labels at end of each month\n  geom_text(\n    data = weather %&gt;% group_by(Month) %&gt;% slice_tail(n = 1),\n    aes(x = dateInYear, y = CulmPrec + 0.1, label = round(CulmPrec, 2)),\n    size = 3\n  ) +\n  \n  # Smaller black downward triangles\n  geom_point(\n    data = filter(weather, RecordP == TRUE),\n    aes(x = dateInYear, y = CulmPrec),\n    shape = 25, size = 1, fill = \"black\"\n  ) +\n  \n  # Vertical month lines\n  geom_vline(xintercept = seq(0, 365, by = 30), color = \"grey80\", linetype = \"dotted\") +\n  \n  scale_x_continuous(breaks = seq(15, 365, by = 30), labels = month.abb) +\n  labs(title = \"Precipitation\", y = \"Precipitation (in)\") +\n  theme_minimal()\n\n# Combine plots\nfinal_plot &lt;- temp_plot / precip_plot + \n  plot_layout(heights = c(2, 1)) +\n  plot_annotation(title = \"SFO Weather in 2011\")\n\nfinal_plot",
+    "crumbs": [
+      "TidyTuesday",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>HW02-P1 Adv Data Viz</span>"
+    ]
+  },
+  {
+    "objectID": "src/tt/Homework2/hw02-p1.html#resources-reflection-required",
+    "href": "src/tt/Homework2/hw02-p1.html#resources-reflection-required",
+    "title": "HW02-P1 Adv Data Viz",
+    "section": "Resources Reflection (required)",
+    "text": "Resources Reflection (required)\nList the resources you used to help with this assignment then write 3-5 sentence reflection on which resources were most helpful in finishing this task.\nResources: - Class notes from Advanced Data Visualization lesson - ggplot2 documentation - Stack Overflow posts\nReflection: My class notes helped me remember how to layer the different geoms and use scales correctly. The ggplot2 documentation was useful for checking arguments and making sure I used the right syntax. I also looked at a few Stack Overflow posts when I got stuck with errors, and they gave me examples that I could adapt to my code. These resources made it easier to finish the plots and understand how to control the details. I spent some time adjusting the triangles and labels until they matched the figure we were trying to recreate, which helped me practice being patient with trial and error. By the end, I felt more comfortable combining several elements in one figure instead of only making simple plots.",
+    "crumbs": [
+      "TidyTuesday",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>HW02-P1 Adv Data Viz</span>"
+    ]
+  },
+  {
+    "objectID": "src/tt/Homework2/hw02-p2.html",
+    "href": "src/tt/Homework2/hw02-p2.html",
+    "title": "HW02-P2 Adv Data Viz",
+    "section": "",
+    "text": "Instructions\nTask: Open up the New York Times article A Summer of Strikes, and scroll down to the plot titled “Union membership has fallen sharply over the past four decades (Share of the work force in a union, by industry)”.\nUsing ggplot2 and other tools in R, recreate this plot. Note that you will need to create the data underlying the plot yourself. You can create this data in R with tibble(). You can also write the data in Excel or Google Sheets and export it as a CSV file.\nRequirements:\nBonus: Additional possibilities to enhance your visualization include adjusting the default aesthetics of the arrows, aligning your plots neatly, and adding margins in order to left-align the y-axis text.",
+    "crumbs": [
+      "TidyTuesday",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>HW02-P2 Adv Data Viz</span>"
+    ]
+  },
+  {
+    "objectID": "src/tt/Homework2/hw02-p2.html#instructions",
+    "href": "src/tt/Homework2/hw02-p2.html#instructions",
+    "title": "HW02-P2 Adv Data Viz",
+    "section": "",
+    "text": "Overall\n\nPanels for “All workers”, “By Sector”, and “By Industry” are shown.\nArrows showing the change from 1983 to 2022 are shown.\n\nNote: be sure that the arrows all point in the correct direction!\n\n\nThe actual percentages in 1983 and 2022 are shown as text.\nX-axis tick marks are at 0, 25, and 50.\nPlot title says “Union membership has fallen sharply over the past four decades”.\nPlot subtitle says “Share of the work force in a union, by industry”.\n\n\nResource reflection\n\nAt least 1 resource is listed\nAt least 3 sentences about resources and their helpfulness in the task",
+    "crumbs": [
+      "TidyTuesday",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>HW02-P2 Adv Data Viz</span>"
+    ]
+  },
+  {
+    "objectID": "src/tt/Homework2/hw02-p2.html#setup",
+    "href": "src/tt/Homework2/hw02-p2.html#setup",
+    "title": "HW02-P2 Adv Data Viz",
+    "section": "Setup",
+    "text": "Setup\n\nCode# Code for loading packages\n# And code for reading in data if using the Excel/Google Sheets--&gt;CSV approach\nlibrary(tidyverse)\n\n\n\nCode# Code for generating the data (if using the tibble() approach)\n# Create the dataset\nunion_data &lt;- tibble(\n  group = c(\"All workers\", \n            \"Private sector\", \"Public sector\",\n            \"Transportation and utilities\", \"Manufacturing\", \"Mining\",\n            \"Construction\", \"Education and health\", \"Arts, entertainment and recreation\",\n            \"Business services\", \"Retail, food and hospitality\", \"Public administration\",\n            \"Agriculture\"),\n  category = c(\"All\", \n               \"Sector\", \"Sector\",\n               \"Industry\",\"Industry\",\"Industry\",\n               \"Industry\",\"Industry\",\"Industry\",\n               \"Industry\",\"Industry\",\"Industry\",\n               \"Industry\"),\n  start_1983 = c(20, 17, 37, 47, 28, 27, 28, 26, 17, 10, 8, 30, 5),\n  end_2022   = c(10, 6, 33, 16, 8, 7, 13, 17, 7, 3, 3, 28, 4)\n)",
+    "crumbs": [
+      "TidyTuesday",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>HW02-P2 Adv Data Viz</span>"
+    ]
+  },
+  {
+    "objectID": "src/tt/Homework2/hw02-p2.html#visualization",
+    "href": "src/tt/Homework2/hw02-p2.html#visualization",
+    "title": "HW02-P2 Adv Data Viz",
+    "section": "Visualization",
+    "text": "Visualization\n\nCodeggplot(union_data) +\n  # Arrows\n  geom_segment(aes(x = end_2022, xend = start_1983,\n                   y = fct_rev(group), yend = fct_rev(group)),\n               arrow = arrow(length = unit(0.15, \"inches\"), type = \"closed\"),\n               color = \"steelblue\", size = 0.6) +\n  \n  # 2022 labels \n  geom_text(aes(x = end_2022, y = fct_rev(group),\n                label = paste0(end_2022, \"%\")),\n            hjust = 1.2, vjust = 0.4, size = 3, color = \"black\") +\n  \n  # 1983 labels \n  geom_text(aes(x = start_1983, y = fct_rev(group),\n                label = paste0(start_1983, \"%\")),\n            hjust = -1.2, vjust = 0.4, size = 3, color = \"black\") +\n  \n  # Facets\n  facet_wrap(~category, scales = \"free_y\", ncol = 1,\n             labeller = labeller(category = c(\n               \"all\" = \"ALL WORKERS\",\n               \"sector\" = \"BY SECTOR\",\n               \"industry\" = \"BY INDUSTRY\"))) +\n  \n  # X-axis\n  scale_x_continuous(limits = c(0, 60), \n                     breaks = c(0, 25, 50),\n                     labels = c(\"0%\", \"25%\", \"50%\")) +\n  \n  labs(\n    title = \"Union membership has fallen sharply over the past four decades\",\n    subtitle = \"Share of the work force in a union, by industry\",\n    x = NULL, y = NULL,\n    caption = \"Source: Current Population Survey, via unionstats.com\"\n  ) +\n  \n  theme_minimal(base_size = 12) +\n  theme( panel.grid.major.y = element_blank(),\n    strip.text = element_text(face = \"bold\", size = 11),\n    plot.title = element_text(face = \"bold\", size = 13),\n    plot.subtitle = element_text(size = 11, margin = margin(b = 10)),\n    plot.caption = element_text(size = 8, color = \"darkgrey\", hjust = 0),\n    axis.text.y = element_text(size = 9)\n  )",
+    "crumbs": [
+      "TidyTuesday",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>HW02-P2 Adv Data Viz</span>"
+    ]
+  },
+  {
+    "objectID": "src/tt/Homework2/hw02-p2.html#resources-reflection-required",
+    "href": "src/tt/Homework2/hw02-p2.html#resources-reflection-required",
+    "title": "HW02-P2 Adv Data Viz",
+    "section": "Resources Reflection (required)",
+    "text": "Resources Reflection (required)\nList the resources you used to help with this assignment then write 3-5 sentence reflection on which resources were most helpful in finishing this task.\nResources:\n\nR for Data Science, Chapter on Data Visualization\nggplot2 documentation (for geom_segment(), geom_text(), and facet_wrap())\nStack Overflow discussions on aligning labels and adjusting hjust\n\nReflection: The most helpful resource for me was the R for Data Science chapter on data visualization because it gave me a clear reminder of how to structure plots in ggplot2. I also found the official ggplot2 documentation useful, especially for understanding how to control arrows with geom_segment() and how to position text labels. Finally, looking at Stack Overflow helped me troubleshoot small alignment issues, like how to adjust hjust so the percentages didn’t overlap with the arrows. Together these resources made it much easier to recreate the New York Times plot in a way that looks clean and readable",
+    "crumbs": [
+      "TidyTuesday",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>HW02-P2 Adv Data Viz</span>"
+    ]
+  },
+  {
     "objectID": "src/ica/ica-sample1.html",
     "href": "src/ica/ica-sample1.html",
     "title": "ICA Sample 1",
@@ -72,7 +182,7 @@
     "text": "Add content here",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>5</span>  <span class='chapter-title'>ICA Sample 1</span>"
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>ICA Sample 1</span>"
     ]
   },
   {
@@ -83,7 +193,7 @@
     "text": "Add content here",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>6</span>  <span class='chapter-title'>ICA Sample 2</span>"
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>ICA Sample 2</span>"
     ]
   },
   {
@@ -94,7 +204,7 @@
     "text": "Exercise\nCarryout the following steps to clean and save the San Francisco Weather data. Make sure to download and add the data file to your portfolio repository as instructed.\nCodelibrary(tidyverse)\nCode my_data &lt;- read.csv(\"/Users/raouda/Documents/GitHub/portfolio-RaoudaBK/src/ica/weather.csv\")\nCodeclean_data &lt;- my_data |&gt;\n  mutate(PrecipYr = na_if(PrecipYr, 99999))\nCodeweather_clean &lt;- clean_data |&gt; \n    arrange(Month, Day) |&gt; \n    mutate(dateInYear = 1:365)\nCodeweather_clean |&gt; \n  mutate(month_name = month.abb[Month]) |&gt; \n  head()\n\n  Month Day Low High NormalLow NormalHigh RecordLow LowYr RecordHigh HiYear\n1     1   1  47   52        44         56        31  1965         68   1996\n2     1   2  48   51        44         56        29  1960         69   1996\n3     1   3  45   53        44         56        31  1950         69   2000\n4     1   4  39   53        44         56        29  1949         62   2006\n5     1   5  38   55        44         56        26  1949         65   1986\n6     1   6  37   52        44         56        29  1950         66   2003\n  Precip RecordPrecip PrecipYr   date Record RecordText RecordP CulmPrec\n1   0.09         2.16     2004 1/1/11  FALSE       &lt;NA&gt;   FALSE     0.09\n2   0.35         1.67     1977 1/2/11  FALSE       &lt;NA&gt;   FALSE     0.44\n3   0.00         1.33     1974 1/3/11  FALSE       &lt;NA&gt;   FALSE     0.44\n4   0.00         5.59     1982 1/4/11  FALSE       &lt;NA&gt;   FALSE     0.44\n5   0.00         1.98     1959 1/5/11  FALSE       &lt;NA&gt;   FALSE     0.44\n6   0.00         2.34     1993 1/6/11  FALSE       &lt;NA&gt;   FALSE     0.44\n  dateInYear month_name\n1          1        Jan\n2          2        Jan\n3          3        Jan\n4          4        Jan\n5          5        Jan\n6          6        Jan",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Cleaning SFO Weather Data</span>"
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Cleaning SFO Weather Data</span>"
     ]
   },
   {
@@ -105,7 +215,7 @@
     "text": "Read in the weather data in this file with the correct relative file path after you move it to the instructed location.\nThere is a variable that has values that don’t make sense in the data context. Figure out which variable this is and clean it up by making those values missing using na_if().\nCreate a variable called dateInYear that indicates the day of the year (1-365) for each case. (Jan 1 should be 1, and Dec 31 should be 365).\nCreate a variable called month_name that shows the 3-letter abbreviation for each case.\nSave the wrangled data to the data/processed/ folder using write_csv(). Name this file weather_clean.csv. Look up the documentation for this function by typing ?write_csv in the Console. You’ll need to write an appropriate relative path.",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Cleaning SFO Weather Data</span>"
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Cleaning SFO Weather Data</span>"
     ]
   },
   {
@@ -116,7 +226,7 @@
     "text": "🧩 Learning Goals\nBy the end of this lesson, you should be able to:",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
     ]
   },
   {
@@ -127,7 +237,7 @@
     "text": "Navigate ggplot2 reference page to find needed functions for a desired visualization\nNavigate the different sections of a function help page to construct desired plot features, in particular,\n\nNavigate the Usage section to identify arguments that must be set\nNavigate the Arguments section to understand how arguments work\nNavigate the Aesthetics section to learn how plot appearance can be controlled\nNavigate the Examples section for some usage examples\n\n\nIdentify when to use different data arguments within ggplot() and geom_() layers",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
     ]
   },
   {
@@ -138,7 +248,7 @@
     "text": "Introduction 1\n\nIn this lesson, we are going to recreate NYTimes 2015 Temperature Visualization (html) using data from San Francisco (SFO) in 2011.\n\n\nScreenshot of NYTimes 2015 Temperature Visualization",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
     ]
   },
   {
@@ -149,7 +259,7 @@
     "text": "Reading Data\nRun the code chunk below to load the tidyverse package and read in the San Francisco weather data.\n\nCodelibrary(tidyverse)\nweather &lt;- read_csv(\"https://mac-stat.github.io/data/sfo_weather.csv\")",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
     ]
   },
   {
@@ -160,7 +270,7 @@
     "text": "Understanding Data\nBelow is the codebook of the data. Familiarize yourself with the meaning of each variable. Use the codebook as a reference when using the data.\n\n\nMonth: Month of the year (1-12)\n\nDay: Day within the month (1-31)\n\nLow/High: Low/high temperature this day\n\nNormalLow/NormalHigh: Typical low/high temperature for this day of the year\n\nRecordLow/RecordHigh: Record low/high temperature for this day of the year\n\nLowYr/HighYr: Year in which the record low/high was observed\n\nPrecip: Amount of precipitation (inches) this day\n\nRecordPrecip: Record amount of precipitation for this day of the year\n\nPrecipYr: Year in which the record precipitation was observed\n\ndate: The actual date in 2011 for this day in YYYY-MM-DD format\n\ndateInYear: What day of the year is it? (1-365)\n\nRecord: Logical (TRUE/FALSE) indicating whether this day had a high temperature record\n\nRecordText: Text that displays the record high for this day (\"Record high: ##\")\n\nRecordP: Logical (TRUE/FALSE) indicating whether this day had a precipitation record\n\nCulmPrec: Cumulative precipitation for the month up to this day",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
     ]
   },
   {
@@ -171,7 +281,7 @@
     "text": "Exercise 1\nExamine the NYTimes 2015 Temperature Visualization (html) then answer the following questions.\nData Storytelling\nThe NYTimes intro says that 2015 was the hottest year on record. The key message is that the climate is getting warmer, and the data shows this. The visualization lets the reader compare each day’s temperature with the “normal” and with past records. By doing this, the graph makes the claim more clear, because we can see how often 2015 went above normal or reached records.\nAesthetic Mapping The visualization uses: - Low and High for daily real temperatures, - NormalLow and NormalHigh for the usual range, - RecordLow and RecordHigh for the records, - dateInYear for the x-axis position.\nThese map to aesthetics like this: - x = dateInYear for the position of each day, - ymin and ymax for the lines (low to high), - color to show if it is record, normal, or observed, - line thickness to separate importance (record is light, observed is darker).",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
     ]
   },
   {
@@ -182,7 +292,7 @@
     "text": "Exercise 2\nNavigate the Geoms section of the ggplot2 reference page to find a geom that corresponds to the visual elements in the temperature plot. Using both the small thumbnail visuals on the right and the names of the geom’s, brainstorm some possibilities for geom’s you might use to recreate the temperature visualization.\nLooking at the ggplot reference, the geoms that can help are: - geom_linerange() which is good for showing the interval between low and high, - geom_ribbon() or geom_rect() which is good for shading an area, - geom_point() for special values like record days, - geom_vline() for drawing vertical lines like the separation between months.\n\n\n\n\n\n\nNavigating Documentation / Reference Pages\n\n\n\nYou need to navigate the geoms further by opening up their reference pages to understand if a particular geom is suitable for our task. Let’s look at the geom_point documentation page to learn how to read a documentation page..\nThe Usage section shows all of the possible inputs (arguments) to the geom. These are all of the ways that a geom can be customized. Just looking at the argument names can help give a hint as to what arguments might fit our needs.\nThe Arguments section, on the other hand, explains in detail what each argument does and the possible values the argument can take. The mapping, data, and ... arguments will be the most commonly used by far.\n\n\nmapping is the argument that is being used when we specify which variables should link or map to the plot aesthetics (the code inside aes()).\n\ndata is the argument where we specify the dataset containing the variables that the geom is using.\n\n... is used for fixed aesthetics (ones that don’t correspond to a variable), eg, to set the color of all points, we use color = \"red\" and to set the size of all points, we use size = 3.\n\nThe Aesthetics section of a geom documentation page gives information on how the visual elements of the geom correspond to data. For example, the geom_point documentation page shows that x and y aesthetics are available. It also shows some new aesthetics like stroke.\n\n\n\n\n\n\n\n\ndata Argument\n\n\n\nPreviously you have used one dataset per plot by specifying that as the first argument of ggplot(). However, multiple data sets can be passed into ggplot as shown in the example below.\n\nCodedata(diamonds)\n\ndiamonds_avg_price &lt;- diamonds |&gt;\n  group_by(carat) |&gt;\n  summarize(avg_price = mean(price)) |&gt;\n  arrange(carat)\ndiamonds_avg_price &lt;- diamonds_avg_price[seq(1, nrow(diamonds_avg_price), 3), ]\n\nggplot(diamonds, aes(x = carat, y = price)) +\n  geom_point() +\n  geom_point(\n    data = diamonds_avg_price,\n    aes(x = carat, y = avg_price),\n    color = \"deepskyblue\",\n    size = 3\n  )\n\n\n\n\n\n\n\n\n\nLook at the geom_linerange documentation page and start off your temperature visualization with the record lows and highs. Your plot should look like the one below. The hex code of the used light tan color is #ECEBE3.\n\n\nSFO Weather Records in 2011\n\n\nCodeggplot(weather) +\n    theme_classic()\n\n\n\n\n\n\n\n\n\n\n\n\n\nKeyboard Shortcuts\n\n\n\nAs you work on this plot, try to use some new keyboard shortcuts. Focus on the following:\n\nInsert code chunk: Ctrl+Alt+I (Windows). Option+Command+I (Mac).\nRun current code chunk: Ctrl+Shift+Enter (Windows). Command+Shift+Return (Mac).\nRun current line/currently selected lines: Ctrl+Enter (Windows). Command+Return (Mac).\n\n\n\n\nCodeggplot(weather) +\n  geom_linerange(aes(x = dateInYear, ymin = RecordLow, ymax = RecordHigh),\n                 color = \"#ECEBE3\") +\n  theme_classic()",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
     ]
   },
   {
@@ -193,7 +303,7 @@
     "text": "Exercise 3\nIn your visualization, also display the usual temperatures (NormalLow and NormalHigh) and actual 2011 temperatures (Low and High). Your plot should look like the one below. The hex code of the color used for the usual temperatures is \"#C8B8BA\" and for the color used for actual temperatures is \"#A90248\".\n\n\nSFO observed, Average, and Record Daily Temperatures in 2011\n\n\nCodeggplot(weather) +\n  # Record \n  geom_linerange(aes(x = dateInYear, ymin = RecordLow, ymax = RecordHigh),\n                 color = \"#ECEBE3\") +\n  # Normal \n  geom_linerange(aes(x = dateInYear, ymin = NormalLow, ymax = NormalHigh),\n                 color = \"#C8B8BA\") +\n  # Observed 2011 temps\n  geom_linerange(aes(x = dateInYear, ymin = Low, ymax = High),\n                 color = \"#A90248\") +\n  theme_classic()\n\n\n\n\n\n\n\n\n\n\n\n\n\nFiner Control\n\n\n\nIf you’d like finer control of the width of these lines/rectangles, check out the geom_rect documentation page.",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
     ]
   },
   {
@@ -204,7 +314,7 @@
     "text": "Exercise 4\nRecreate the visual demarcations of the months by adding vertical lines separating the months. Brainstorm how we might draw those vertical lines. What geom might we use? What subset of the data might we use in that geom layer to draw lines only at the month divisions?\n\nCodemonth_lines &lt;- weather %&gt;%\n  group_by(Month) %&gt;%\n  summarize(first_day = min(dateInYear))\n\nggplot(weather) +\n  geom_linerange(aes(x = dateInYear, ymin = RecordLow, ymax = RecordHigh),\n                 color = \"#ECEBE3\") +\n  geom_linerange(aes(x = dateInYear, ymin = NormalLow, ymax = NormalHigh),\n                 color = \"#C8B8BA\") +\n  geom_linerange(aes(x = dateInYear, ymin = Low, ymax = High),\n                 color = \"#A90248\") +\n  geom_vline(data = month_lines, aes(xintercept = first_day),\n             color = \"grey40\", linetype = \"dashed\") +\n  theme_classic()",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
     ]
   },
   {
@@ -215,7 +325,7 @@
     "text": "Exercise 5\nChange the x-axis labels so that the month names display in the center of each month’s slice of the plot.\n\n\n\n\n\n\nMonth Names\n\n\n\nR has built-in variables called month.abb and month.name that contain abbreviated and full month names.\n\n\nTry to figuring out this new challenge using search engines and LLMs:\n\nSearch Engines. Use Google to search for possible solutions using the jargon that is most likely to return the most relevant results. Record search queries and your thought process in selecting which search results to look at first.\nLLMs. Use ChatGPT or Gemini with prompts that will most efficiently get you the desired results. Record the chat prompts used and output given. Evaluate the output. Do you fully understand the code generated? How can you tell that the generated code is correct?\n\n\nCodeggplot(weather) +\n  geom_linerange(aes(x = dateInYear, ymin = RecordLow, ymax = RecordHigh),\n                 color = \"#ECEBE3\") +\n  geom_linerange(aes(x = dateInYear, ymin = NormalLow, ymax = NormalHigh),\n                 color = \"#C8B8BA\") +\n  geom_linerange(aes(x = dateInYear, ymin = Low, ymax = High),\n                 color = \"#A90248\") +\n  scale_x_continuous(\n    breaks = c(15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345),\n    labels = month.abb\n  ) +\n  theme_classic()",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
     ]
   },
   {
@@ -226,7 +336,7 @@
     "text": "Exercise 6\nCreate a precipitation plot that looks like the following. Note that\n\nThe triangles point to precipitation records–refer to the data codebook above for the RecordP variable.\nThe numbers on the plot indicate the total precipitation for the month–search the hjust and vjust options to adjust the alignment of the numbers.\nThe blue and tan colors hex codes are \"#32a3d8\" and \"#ebeae2\", respectively.\n\n\n\nSFO Precipitation in 2011\n\n\nCodeggplot(weather, aes(x = dateInYear, y = Precip)) +\n  geom_col(fill = \"#ebeae2\") +\n  geom_point(data = filter(weather, RecordP == TRUE),\n             aes(x = dateInYear, y = Precip),\n             shape = 17, color = \"blue\", size = 3) +\n  geom_text(data = weather %&gt;%\n              group_by(Month) %&gt;%\n              summarize(total = sum(Precip),\n                        mid = mean(dateInYear)),\n            aes(x = mid, y = total + 0.2, label = total),\n            vjust = 0, hjust = 0.5) +\n  theme_classic()",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
     ]
   },
   {
@@ -237,7 +347,7 @@
     "text": "Done!\n\nCheck the ICA Instructions for how to (a) push your code to GitHub and (b) update your portfolio website",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
     ]
   },
   {
@@ -248,7 +358,106 @@
     "text": "The exercise in this lesson are inspired by an assignment from the Concepts in Computing with Data course at UC Berkeley taught by Dr. Deborah Nolan.↩︎",
     "crumbs": [
       "In-Class Activities",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>3 Advanced Data Viz</span>"
+    ]
+  },
+  {
+    "objectID": "src/ica/ICA5.html",
+    "href": "src/ica/ICA5.html",
+    "title": "6 Adv Data wrangling P1",
+    "section": "",
+    "text": "🧩 Learning Goals\nBy the end of this lesson, you should be able to:",
+    "crumbs": [
+      "In-Class Activities",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>6 Adv Data wrangling P1</span>"
+    ]
+  },
+  {
+    "objectID": "src/ica/ICA5.html#learning-goals",
+    "href": "src/ica/ICA5.html#learning-goals",
+    "title": "6 Adv Data wrangling P1",
+    "section": "",
+    "text": "Determine the class of a given object and identify concerns to be wary of when manipulating an object of that class (numerics, logicals, factors, dates, strings, data.frames)\nExplain what vector recycling is, when it can be a problem, and how to avoid those problems\nUse a variety of functions to wrangle numerical and logical data\nExtract date-time information using the lubridate package\nUse the forcats package to wrangle factor data",
+    "crumbs": [
+      "In-Class Activities",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>6 Adv Data wrangling P1</span>"
+    ]
+  },
+  {
+    "objectID": "src/ica/ICA5.html#helpful-cheatsheets",
+    "href": "src/ica/ICA5.html#helpful-cheatsheets",
+    "title": "6 Adv Data wrangling P1",
+    "section": "Helpful Cheatsheets",
+    "text": "Helpful Cheatsheets\nRStudio (Posit) maintains a collection of wonderful cheatsheets. The following will be helpful:\n\nData transformation with dplyr\nDates and times with lubridate\nFactors with forcats\n\nData Wrangling Verbs (from Stat/Comp 112)\n\n\nmutate(): creates/changes columns/elements in a data frame/tibble\n\nselect(): keeps subset of columns/elements in a data frame/tibble\n\nfilter(): keeps subsets of rows in a data frame/tibble\n\narrange(): sorts rows in a data frame/tibble\n\ngroup_by(): internally groups rows in data frame/tibble by values in 1 or more columsn/elements\n\nsummarize(): collapses/combines information across rows using functions such as n(), sum(), mean(), min(), max(), median(), sd()\n\n\ncount(): shortcut for group_by() |&gt; summarize(n = n())\n\n\nleft_join(): mutating join of two data frames/tibbles keeping all rows in left data frame\n\nfull_join(): mutating join of two data frames/tibbles keeping all rows in both data frames\n\ninner_join(): mutating join of two data frames/tibbles keeping rows in left data frame that find match in right\n\nsemi_join(): filtering join of two data frames/tibbles keeping rows in left data frame that find match in right\n\nanti_join(): filtering join of two data frames/tibbles keeping rows in left data frame that do not find match in right\n\npivot_wider(): rearrange values from two columns to many(one column becomes the names of new variables, one column becomes the values of the new variables)\n\npivot_longer(): rearrange values from many columns to two (the names of the columns go to one new variable, the values of the columns go to a second new variable)",
+    "crumbs": [
+      "In-Class Activities",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>6 Adv Data wrangling P1</span>"
+    ]
+  },
+  {
+    "objectID": "src/ica/ICA5.html#vectors",
+    "href": "src/ica/ICA5.html#vectors",
+    "title": "6 Adv Data wrangling P1",
+    "section": "Vectors",
+    "text": "Vectors\nAn atomic vector is a storage container in R where all elements in the container are of the same type. The types that are relevant to data science are:\n\n\nlogical (also known as boolean)\nnumbers\n\ninteger\n\nnumeric floating point (also known as double)\n\n\n\ncharacter string\n\nDate and date-time (saved as POSIXct)\nfactor\n\nFunction documentation will refer to vectors frequently.\nSee examples below:\n\n\nggplot2::scale_x_continuous()\n\n\nbreaks: A numeric vector of positions\n\nlabels: A character vector giving labels (must be same length as breaks)\n\n\n\nshiny::sliderInput()\n\n\nvalue: The initial value of the slider […] A length one vector will create a regular slider; a length two vector will create a double-ended range slider.\n\n\n\nWhen you need a vector, you can create one manually using\n\n\nc(): the combine function\n\nOr you can create one based on available data using\n\n\ndataset |&gt; mutate(newvar = variable &gt; 5) |&gt; pull(newvar): taking one column out of a dataset\n\ndataset |&gt; pull(variable) |&gt; unique(): taking one column out of a dataset and finding unique values\n\n\nCodec(\"Fair\", \"Good\", \"Very Good\", \"Premium\", \"Ideal\")\n\n[1] \"Fair\"      \"Good\"      \"Very Good\" \"Premium\"   \"Ideal\"    \n\nCodediamonds |&gt; pull(cut) |&gt; unique()\n\n[1] Ideal     Premium   Good      Very Good Fair     \nLevels: Fair &lt; Good &lt; Very Good &lt; Premium &lt; Ideal",
+    "crumbs": [
+      "In-Class Activities",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>6 Adv Data wrangling P1</span>"
+    ]
+  },
+  {
+    "objectID": "src/ica/ICA5.html#logicals",
+    "href": "src/ica/ICA5.html#logicals",
+    "title": "6 Adv Data wrangling P1",
+    "section": "Logicals",
+    "text": "Logicals\nNotes\nWhat does a logical vector look like?\n\nCodex &lt;- c(TRUE, FALSE, NA)\nx\n\n[1]  TRUE FALSE    NA\n\nCodeclass(x)\n\n[1] \"logical\"\n\n\nYou will often create logical vectors with comparison operators: &gt;, &lt;, &lt;=, &gt;=, ==, !=.\n\nCodex &lt;- c(1, 2, 9, 12)\nx &lt; 2\n\n[1]  TRUE FALSE FALSE FALSE\n\nCodex &lt;= 2\n\n[1]  TRUE  TRUE FALSE FALSE\n\nCodex &gt; 9\n\n[1] FALSE FALSE FALSE  TRUE\n\nCodex &gt;= 9\n\n[1] FALSE FALSE  TRUE  TRUE\n\nCodex == 12\n\n[1] FALSE FALSE FALSE  TRUE\n\nCodex != 12\n\n[1]  TRUE  TRUE  TRUE FALSE\n\n\nWhen you want to check for set containment, the %in% operator is the correct way to do this (as opposed to ==).\n\nCodex &lt;- c(1, 2, 9, 4)\nx == c(1, 2, 4)\n\nWarning in x == c(1, 2, 4): longer object length is not a multiple of shorter\nobject length\n\n\n[1]  TRUE  TRUE FALSE FALSE\n\nCodex %in% c(1, 2, 4)\n\n[1]  TRUE  TRUE FALSE  TRUE\n\n\nThe Warning: longer object length is not a multiple of shorter object length is a manifestation of vector recycling.\nIn R, if two vectors are being combined or compared, the shorter one will be repeated to match the length of the longer one–even if longer object length isn’t a multiple of the shorter object length. We can see the exact recycling that happens below:\n\nCodex &lt;- c(1, 2, 9, 4)\nx == c(1, 2, 4)\n\n[1]  TRUE  TRUE FALSE FALSE\n\nCodex == c(1, 2, 4, 1) # This line demonstrates the recycling that happens on the previous line\n\n[1]  TRUE  TRUE FALSE FALSE\n\n\nLogical vectors can also be created with functions. is.na() is one useful example:\n\nCodex &lt;- c(1, 4, 9, NA)\nx == NA\n\n[1] NA NA NA NA\n\nCodeis.na(x)\n\n[1] FALSE FALSE FALSE  TRUE\n\n\nWe can negate a logical object with !. We can combine logical objects with & (and) and | (or).\n\nCodex &lt;- c(1, 2, 4, 9)\nx &gt; 1 & x &lt; 5\n\n[1] FALSE  TRUE  TRUE FALSE\n\nCode!(x &gt; 1 & x &lt; 5)\n\n[1]  TRUE FALSE FALSE  TRUE\n\nCodex &lt; 2 | x &gt; 8\n\n[1]  TRUE FALSE FALSE  TRUE\n\n\nWe can summarize logical vectors with:\n\n\nany(): Are ANY of the values TRUE?\n\nall(): Are ALL of the values TRUE?\n\nsum(): How many of the values are TRUE?\n\nmean(): What fraction of the values are TRUE?\n\n\nCodex &lt;- c(1, 2, 4, 9)\nany(x == 1)\n\n[1] TRUE\n\nCodeall(x &lt; 10)\n\n[1] TRUE\n\nCodesum(x == 1)\n\n[1] 1\n\nCodemean(x == 1)\n\n[1] 0.25\n\n\nif_else() and case_when() are functions that allow you to return values depending on the value of a logical vector. You’ll explore the documentation for these in the following exercises.\n\n\n\n\n\n\nNote: ifelse() (from base R) and if_else() (from tidyverse) are different functions. We prefer if_else() for many reasons (examples below).\n\nNoisy to make sure you catch issues/bugs\nCan explicitly handle missing values\nKeeps dates as dates\n\n\nExamples\n\nCodex &lt;- c(-1, -2, 4, 9, NA)\n\nifelse(x &gt; 0, 'positive', 'negative')\n\n[1] \"negative\" \"negative\" \"positive\" \"positive\" NA        \n\nCodeif_else(x &gt; 0, 'positive', 'negative')\n\n[1] \"negative\" \"negative\" \"positive\" \"positive\" NA        \n\nCodeifelse(x &gt; 0, 1, 'negative') # Bad: doesn't complain with combo of data types\n\n[1] \"negative\" \"negative\" \"1\"        \"1\"        NA        \n\nCode#if_else(x &gt; 0, 1, 'negative') # Good:noisy to make sure you catch issues\n\nif_else(x &gt; 0, 'positive', 'negative', missing = 'missing') # Good: can explicitly handle NA\n\n[1] \"negative\" \"negative\" \"positive\" \"positive\" \"missing\" \n\nCodefun_dates &lt;- mdy('1-1-2025') + 0:365\nifelse(fun_dates &lt; today(), fun_dates + years(), fun_dates) # Bad: converts dates to integers\n\n  [1] 20454 20455 20456 20457 20458 20459 20460 20461 20462 20463 20464 20465\n [13] 20466 20467 20468 20469 20470 20471 20472 20473 20474 20475 20476 20477\n [25] 20478 20479 20480 20481 20482 20483 20484 20485 20486 20487 20488 20489\n [37] 20490 20491 20492 20493 20494 20495 20496 20497 20498 20499 20500 20501\n [49] 20502 20503 20504 20505 20506 20507 20508 20509 20510 20511 20512 20513\n [61] 20514 20515 20516 20517 20518 20519 20520 20521 20522 20523 20524 20525\n [73] 20526 20527 20528 20529 20530 20531 20532 20533 20534 20535 20536 20537\n [85] 20538 20539 20540 20541 20542 20543 20544 20545 20546 20547 20548 20549\n [97] 20550 20551 20552 20553 20554 20555 20556 20557 20558 20559 20560 20561\n[109] 20562 20563 20564 20565 20566 20567 20568 20569 20570 20571 20572 20573\n[121] 20574 20575 20576 20577 20578 20579 20580 20581 20582 20583 20584 20585\n[133] 20586 20587 20588 20589 20590 20591 20592 20593 20594 20595 20596 20597\n[145] 20598 20599 20600 20601 20602 20603 20604 20605 20606 20607 20608 20609\n[157] 20610 20611 20612 20613 20614 20615 20616 20617 20618 20619 20620 20621\n[169] 20622 20623 20624 20625 20626 20627 20628 20629 20630 20631 20632 20633\n[181] 20634 20635 20636 20637 20638 20639 20640 20641 20642 20643 20644 20645\n[193] 20646 20647 20648 20649 20650 20651 20652 20653 20654 20655 20656 20657\n[205] 20658 20659 20660 20661 20662 20663 20664 20665 20666 20667 20668 20669\n[217] 20670 20671 20672 20673 20674 20675 20676 20677 20678 20679 20680 20681\n[229] 20682 20683 20684 20685 20686 20687 20688 20689 20690 20691 20692 20693\n[241] 20694 20695 20696 20697 20698 20699 20700 20701 20702 20703 20704 20705\n[253] 20706 20707 20708 20709 20710 20711 20712 20713 20349 20350 20351 20352\n[265] 20353 20354 20355 20356 20357 20358 20359 20360 20361 20362 20363 20364\n[277] 20365 20366 20367 20368 20369 20370 20371 20372 20373 20374 20375 20376\n[289] 20377 20378 20379 20380 20381 20382 20383 20384 20385 20386 20387 20388\n[301] 20389 20390 20391 20392 20393 20394 20395 20396 20397 20398 20399 20400\n[313] 20401 20402 20403 20404 20405 20406 20407 20408 20409 20410 20411 20412\n[325] 20413 20414 20415 20416 20417 20418 20419 20420 20421 20422 20423 20424\n[337] 20425 20426 20427 20428 20429 20430 20431 20432 20433 20434 20435 20436\n[349] 20437 20438 20439 20440 20441 20442 20443 20444 20445 20446 20447 20448\n[361] 20449 20450 20451 20452 20453 20454\n\nCodeif_else(fun_dates &lt; today(), fun_dates + years(), fun_dates) # Good: keeps dates as dates\n\n  [1] \"2026-01-01\" \"2026-01-02\" \"2026-01-03\" \"2026-01-04\" \"2026-01-05\"\n  [6] \"2026-01-06\" \"2026-01-07\" \"2026-01-08\" \"2026-01-09\" \"2026-01-10\"\n [11] \"2026-01-11\" \"2026-01-12\" \"2026-01-13\" \"2026-01-14\" \"2026-01-15\"\n [16] \"2026-01-16\" \"2026-01-17\" \"2026-01-18\" \"2026-01-19\" \"2026-01-20\"\n [21] \"2026-01-21\" \"2026-01-22\" \"2026-01-23\" \"2026-01-24\" \"2026-01-25\"\n [26] \"2026-01-26\" \"2026-01-27\" \"2026-01-28\" \"2026-01-29\" \"2026-01-30\"\n [31] \"2026-01-31\" \"2026-02-01\" \"2026-02-02\" \"2026-02-03\" \"2026-02-04\"\n [36] \"2026-02-05\" \"2026-02-06\" \"2026-02-07\" \"2026-02-08\" \"2026-02-09\"\n [41] \"2026-02-10\" \"2026-02-11\" \"2026-02-12\" \"2026-02-13\" \"2026-02-14\"\n [46] \"2026-02-15\" \"2026-02-16\" \"2026-02-17\" \"2026-02-18\" \"2026-02-19\"\n [51] \"2026-02-20\" \"2026-02-21\" \"2026-02-22\" \"2026-02-23\" \"2026-02-24\"\n [56] \"2026-02-25\" \"2026-02-26\" \"2026-02-27\" \"2026-02-28\" \"2026-03-01\"\n [61] \"2026-03-02\" \"2026-03-03\" \"2026-03-04\" \"2026-03-05\" \"2026-03-06\"\n [66] \"2026-03-07\" \"2026-03-08\" \"2026-03-09\" \"2026-03-10\" \"2026-03-11\"\n [71] \"2026-03-12\" \"2026-03-13\" \"2026-03-14\" \"2026-03-15\" \"2026-03-16\"\n [76] \"2026-03-17\" \"2026-03-18\" \"2026-03-19\" \"2026-03-20\" \"2026-03-21\"\n [81] \"2026-03-22\" \"2026-03-23\" \"2026-03-24\" \"2026-03-25\" \"2026-03-26\"\n [86] \"2026-03-27\" \"2026-03-28\" \"2026-03-29\" \"2026-03-30\" \"2026-03-31\"\n [91] \"2026-04-01\" \"2026-04-02\" \"2026-04-03\" \"2026-04-04\" \"2026-04-05\"\n [96] \"2026-04-06\" \"2026-04-07\" \"2026-04-08\" \"2026-04-09\" \"2026-04-10\"\n[101] \"2026-04-11\" \"2026-04-12\" \"2026-04-13\" \"2026-04-14\" \"2026-04-15\"\n[106] \"2026-04-16\" \"2026-04-17\" \"2026-04-18\" \"2026-04-19\" \"2026-04-20\"\n[111] \"2026-04-21\" \"2026-04-22\" \"2026-04-23\" \"2026-04-24\" \"2026-04-25\"\n[116] \"2026-04-26\" \"2026-04-27\" \"2026-04-28\" \"2026-04-29\" \"2026-04-30\"\n[121] \"2026-05-01\" \"2026-05-02\" \"2026-05-03\" \"2026-05-04\" \"2026-05-05\"\n[126] \"2026-05-06\" \"2026-05-07\" \"2026-05-08\" \"2026-05-09\" \"2026-05-10\"\n[131] \"2026-05-11\" \"2026-05-12\" \"2026-05-13\" \"2026-05-14\" \"2026-05-15\"\n[136] \"2026-05-16\" \"2026-05-17\" \"2026-05-18\" \"2026-05-19\" \"2026-05-20\"\n[141] \"2026-05-21\" \"2026-05-22\" \"2026-05-23\" \"2026-05-24\" \"2026-05-25\"\n[146] \"2026-05-26\" \"2026-05-27\" \"2026-05-28\" \"2026-05-29\" \"2026-05-30\"\n[151] \"2026-05-31\" \"2026-06-01\" \"2026-06-02\" \"2026-06-03\" \"2026-06-04\"\n[156] \"2026-06-05\" \"2026-06-06\" \"2026-06-07\" \"2026-06-08\" \"2026-06-09\"\n[161] \"2026-06-10\" \"2026-06-11\" \"2026-06-12\" \"2026-06-13\" \"2026-06-14\"\n[166] \"2026-06-15\" \"2026-06-16\" \"2026-06-17\" \"2026-06-18\" \"2026-06-19\"\n[171] \"2026-06-20\" \"2026-06-21\" \"2026-06-22\" \"2026-06-23\" \"2026-06-24\"\n[176] \"2026-06-25\" \"2026-06-26\" \"2026-06-27\" \"2026-06-28\" \"2026-06-29\"\n[181] \"2026-06-30\" \"2026-07-01\" \"2026-07-02\" \"2026-07-03\" \"2026-07-04\"\n[186] \"2026-07-05\" \"2026-07-06\" \"2026-07-07\" \"2026-07-08\" \"2026-07-09\"\n[191] \"2026-07-10\" \"2026-07-11\" \"2026-07-12\" \"2026-07-13\" \"2026-07-14\"\n[196] \"2026-07-15\" \"2026-07-16\" \"2026-07-17\" \"2026-07-18\" \"2026-07-19\"\n[201] \"2026-07-20\" \"2026-07-21\" \"2026-07-22\" \"2026-07-23\" \"2026-07-24\"\n[206] \"2026-07-25\" \"2026-07-26\" \"2026-07-27\" \"2026-07-28\" \"2026-07-29\"\n[211] \"2026-07-30\" \"2026-07-31\" \"2026-08-01\" \"2026-08-02\" \"2026-08-03\"\n[216] \"2026-08-04\" \"2026-08-05\" \"2026-08-06\" \"2026-08-07\" \"2026-08-08\"\n[221] \"2026-08-09\" \"2026-08-10\" \"2026-08-11\" \"2026-08-12\" \"2026-08-13\"\n[226] \"2026-08-14\" \"2026-08-15\" \"2026-08-16\" \"2026-08-17\" \"2026-08-18\"\n[231] \"2026-08-19\" \"2026-08-20\" \"2026-08-21\" \"2026-08-22\" \"2026-08-23\"\n[236] \"2026-08-24\" \"2026-08-25\" \"2026-08-26\" \"2026-08-27\" \"2026-08-28\"\n[241] \"2026-08-29\" \"2026-08-30\" \"2026-08-31\" \"2026-09-01\" \"2026-09-02\"\n[246] \"2026-09-03\" \"2026-09-04\" \"2026-09-05\" \"2026-09-06\" \"2026-09-07\"\n[251] \"2026-09-08\" \"2026-09-09\" \"2026-09-10\" \"2026-09-11\" \"2026-09-12\"\n[256] \"2026-09-13\" \"2026-09-14\" \"2026-09-15\" \"2026-09-16\" \"2026-09-17\"\n[261] \"2025-09-18\" \"2025-09-19\" \"2025-09-20\" \"2025-09-21\" \"2025-09-22\"\n[266] \"2025-09-23\" \"2025-09-24\" \"2025-09-25\" \"2025-09-26\" \"2025-09-27\"\n[271] \"2025-09-28\" \"2025-09-29\" \"2025-09-30\" \"2025-10-01\" \"2025-10-02\"\n[276] \"2025-10-03\" \"2025-10-04\" \"2025-10-05\" \"2025-10-06\" \"2025-10-07\"\n[281] \"2025-10-08\" \"2025-10-09\" \"2025-10-10\" \"2025-10-11\" \"2025-10-12\"\n[286] \"2025-10-13\" \"2025-10-14\" \"2025-10-15\" \"2025-10-16\" \"2025-10-17\"\n[291] \"2025-10-18\" \"2025-10-19\" \"2025-10-20\" \"2025-10-21\" \"2025-10-22\"\n[296] \"2025-10-23\" \"2025-10-24\" \"2025-10-25\" \"2025-10-26\" \"2025-10-27\"\n[301] \"2025-10-28\" \"2025-10-29\" \"2025-10-30\" \"2025-10-31\" \"2025-11-01\"\n[306] \"2025-11-02\" \"2025-11-03\" \"2025-11-04\" \"2025-11-05\" \"2025-11-06\"\n[311] \"2025-11-07\" \"2025-11-08\" \"2025-11-09\" \"2025-11-10\" \"2025-11-11\"\n[316] \"2025-11-12\" \"2025-11-13\" \"2025-11-14\" \"2025-11-15\" \"2025-11-16\"\n[321] \"2025-11-17\" \"2025-11-18\" \"2025-11-19\" \"2025-11-20\" \"2025-11-21\"\n[326] \"2025-11-22\" \"2025-11-23\" \"2025-11-24\" \"2025-11-25\" \"2025-11-26\"\n[331] \"2025-11-27\" \"2025-11-28\" \"2025-11-29\" \"2025-11-30\" \"2025-12-01\"\n[336] \"2025-12-02\" \"2025-12-03\" \"2025-12-04\" \"2025-12-05\" \"2025-12-06\"\n[341] \"2025-12-07\" \"2025-12-08\" \"2025-12-09\" \"2025-12-10\" \"2025-12-11\"\n[346] \"2025-12-12\" \"2025-12-13\" \"2025-12-14\" \"2025-12-15\" \"2025-12-16\"\n[351] \"2025-12-17\" \"2025-12-18\" \"2025-12-19\" \"2025-12-20\" \"2025-12-21\"\n[356] \"2025-12-22\" \"2025-12-23\" \"2025-12-24\" \"2025-12-25\" \"2025-12-26\"\n[361] \"2025-12-27\" \"2025-12-28\" \"2025-12-29\" \"2025-12-30\" \"2025-12-31\"\n[366] \"2026-01-01\"\n\n\n\n\n\n\nExercises\nLoad the diamonds dataset, and filter to the first 1000 diamonds.\n\nCodedata(diamonds)\ndiamonds &lt;- diamonds |&gt; \n    slice_head(n = 1000)\n\n\nUsing tidyverse functions, complete the following:\n\nSubset to diamonds that are less than 400 dollars or more than 10000 dollars.\nSubset to diamonds that are between 500 and 600 dollars (inclusive).\nHow many diamonds are of either Fair, Premium, or Ideal cut (a total count)? What fraction of diamonds are of Fair, Premium, or Ideal cut?\n\nFirst, do this a wrong way with ==. Predict the warning message that you will receive.\nSecond, do this the correct way with an appropriate logical operator.\n\n\nAre there any diamonds of Fair cut that are more than $3000? Are all diamonds of Ideal cut more than $2000?\nCreate two new categorized versions of price by looking up the documentation for if_else() and case_when():\n\n\nprice_cat1: “low” if price is less than 500 and “high” otherwise\n\nprice_cat2: “low” if price is less than 500, “medium” if price is between 500 and 1000 dollars inclusive, and “high” otherwise.\n\n\n\n\nCode#1\ndiamonds|&gt;\n  filter(price &lt; 400 | price &gt; 1000)\n\n# A tibble: 880 × 10\n   carat cut       color clarity depth table price     x     y     z\n   &lt;dbl&gt; &lt;ord&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n 1  0.23 Ideal     E     SI2      61.5    55   326  3.95  3.98  2.43\n 2  0.21 Premium   E     SI1      59.8    61   326  3.89  3.84  2.31\n 3  0.23 Good      E     VS1      56.9    65   327  4.05  4.07  2.31\n 4  0.29 Premium   I     VS2      62.4    58   334  4.2   4.23  2.63\n 5  0.31 Good      J     SI2      63.3    58   335  4.34  4.35  2.75\n 6  0.24 Very Good J     VVS2     62.8    57   336  3.94  3.96  2.48\n 7  0.24 Very Good I     VVS1     62.3    57   336  3.95  3.98  2.47\n 8  0.26 Very Good H     SI1      61.9    55   337  4.07  4.11  2.53\n 9  0.22 Fair      E     VS2      65.1    61   337  3.87  3.78  2.49\n10  0.23 Very Good H     VS1      59.4    61   338  4     4.05  2.39\n# ℹ 870 more rows\n\nCode#2\ndiamonds |&gt; \n  filter(price&lt;600, price&gt;500)\n\n# A tibble: 90 × 10\n   carat cut       color clarity depth table price     x     y     z\n   &lt;dbl&gt; &lt;ord&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n 1  0.35 Ideal     I     VS1      60.9  57     552  4.54  4.59  2.78\n 2  0.3  Premium   D     SI1      62.6  59     552  4.23  4.27  2.66\n 3  0.3  Ideal     D     SI1      62.5  57     552  4.29  4.32  2.69\n 4  0.3  Ideal     D     SI1      62.1  56     552  4.3   4.33  2.68\n 5  0.42 Premium   I     SI2      61.5  59     552  4.78  4.84  2.96\n 6  0.28 Ideal     G     VVS2     61.4  56     553  4.19  4.22  2.58\n 7  0.32 Ideal     I     VVS1     62    55.3   553  4.39  4.42  2.73\n 8  0.31 Very Good G     SI1      63.3  57     553  4.33  4.3   2.73\n 9  0.31 Premium   G     SI1      61.8  58     553  4.35  4.32  2.68\n10  0.24 Premium   E     VVS1     60.7  58     553  4.01  4.03  2.44\n# ℹ 80 more rows\n\nCode#3\n## The wrong way because using == is wrong because it compares elements by elements and recycles the shorter vector so it doesn’t actually test if each value is one of the three options.\ndiamonds |&gt;\n  mutate(cut = cut == c(\"fair\", \"premium\", \"Ideal\")) |&gt;\n  summarize(numcut = sum(cut), fraction = mean(cut))\n\n# A tibble: 1 × 2\n  numcut fraction\n   &lt;int&gt;    &lt;dbl&gt;\n1    114    0.114\n\nCode# Because %in% checks if each cut is actually a member of the set fair and stuff. No recycling issue\ndiamonds |&gt;\n  mutate(cut = cut %in%c(\"Fair\", \"Premium\", \"Ideal\")) |&gt;\n  summarize(numcut = sum(cut), fraction = mean(cut))\n\n# A tibble: 1 × 2\n  numcut fraction\n   &lt;int&gt;    &lt;dbl&gt;\n1    685    0.685\n\nCode#4\ndiamonds |&gt; \n  filter(cut == \"fair\") |&gt; \n  summarize(price = any(price&gt;3000))\n\n# A tibble: 1 × 1\n  price\n  &lt;lgl&gt;\n1 FALSE\n\nCode#5",
+    "crumbs": [
+      "In-Class Activities",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>6 Adv Data wrangling P1</span>"
+    ]
+  },
+  {
+    "objectID": "src/ica/ICA5.html#numerics",
+    "href": "src/ica/ICA5.html#numerics",
+    "title": "6 Adv Data wrangling P1",
+    "section": "Numerics",
+    "text": "Numerics\nNotes\nNumerical data can be of class integer or numeric (representing real numbers).\n\nCodex &lt;- 1:3\nx\n\n[1] 1 2 3\n\nCodeclass(x)\n\n[1] \"integer\"\n\nCodex &lt;- c(1+1e-9, 2, 3)\nx\n\n[1] 1 2 3\n\nCodeclass(x)\n\n[1] \"numeric\"\n\n\nThe Numbers chapter in R4DS covers the following functions that are all useful for wrangling numeric data:\n\n\nn(), n_distinct(): Counting and counting the number of unique values\n\nsum(is.na()): Counting the number of missing values\n\nmin(), max()\n\n\npmin(), pmax(): Get the min and max across several vectors\nInteger division: %/%. Remainder: %%\n\n\n121 %/% 100 = 1 and 121 %% 100 = 21\n\n\n\n\nround(), floor(), ceiling(): Rounding functions (to a specified number of decimal places, to the largest integer below a number, to the smallest integer above a number)\n\ncut(): Cut a numerical vector into categories\n\ncumsum(), cummean(), cummin(), cummax(): Cumulative functions\n\nrank(): Provide the ranks of the numbers in a vector\n\nlead(), lag(): shift a vector by padding with NAs\nNumerical summaries: mean, median, min, max, quantile, sd, IQR\n\nNote that all numerical summary functions have an na.rm argument that should be set to TRUE if you have missing data.\n\n\nExercises\nExercises will be on HW4.\nThe best way to add these functions and operators to your vocabulary is to need to recall them. Refer to the list of functions above as you try the exercises.\nYou will need to reference function documentation to look at arguments and look in the Examples section.",
+    "crumbs": [
+      "In-Class Activities",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>6 Adv Data wrangling P1</span>"
+    ]
+  },
+  {
+    "objectID": "src/ica/ICA5.html#dates",
+    "href": "src/ica/ICA5.html#dates",
+    "title": "6 Adv Data wrangling P1",
+    "section": "Dates",
+    "text": "Dates\nNotes\nThe lubridate package contains useful functions for working with dates and times. The lubridate function reference is a useful resource for finding the functions you need. We’ll take a brief tour of this reference page.\nWe’ll use the lakers dataset in the lubridate package to illustrate some examples.\n\nCodelakers &lt;- as_tibble(lakers)\nhead(lakers)\n\n# A tibble: 6 × 13\n     date opponent game_type time  period etype team  player result points type \n    &lt;int&gt; &lt;chr&gt;    &lt;chr&gt;     &lt;chr&gt;  &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;int&gt; &lt;chr&gt;\n1  2.01e7 POR      home      12:00      1 jump… OFF   \"\"     \"\"          0 \"\"   \n2  2.01e7 POR      home      11:39      1 shot  LAL   \"Pau … \"miss…      0 \"hoo…\n3  2.01e7 POR      home      11:37      1 rebo… LAL   \"Vlad… \"\"          0 \"off\"\n4  2.01e7 POR      home      11:25      1 shot  LAL   \"Dere… \"miss…      0 \"lay…\n5  2.01e7 POR      home      11:23      1 rebo… LAL   \"Pau … \"\"          0 \"off\"\n6  2.01e7 POR      home      11:22      1 shot  LAL   \"Pau … \"made\"      2 \"hoo…\n# ℹ 2 more variables: x &lt;int&gt;, y &lt;int&gt;\n\n\nBelow we use date-time parsing functions to represent the date and time variables with date-time classes:\n\nCodelakers &lt;- lakers |&gt;\n    mutate(\n        date = ymd(date),\n        time = ms(time)\n    )\n\n\nBelow we use extraction functions to get components of the date-time objects:\n\nCodelakers_clean &lt;- lakers |&gt;\n    mutate(\n        year = year(date),\n        month = month(date),\n        day = day(date),\n        day_of_week = wday(date, label = TRUE),\n        minute = minute(time),\n        second = second(time)\n    )\nlakers_clean |&gt; select(year:second)\n\n# A tibble: 34,624 × 6\n    year month   day day_of_week minute second\n   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;ord&gt;        &lt;dbl&gt;  &lt;dbl&gt;\n 1  2008    10    28 Tue             12      0\n 2  2008    10    28 Tue             11     39\n 3  2008    10    28 Tue             11     37\n 4  2008    10    28 Tue             11     25\n 5  2008    10    28 Tue             11     23\n 6  2008    10    28 Tue             11     22\n 7  2008    10    28 Tue             11     22\n 8  2008    10    28 Tue             11     22\n 9  2008    10    28 Tue             11      0\n10  2008    10    28 Tue             10     53\n# ℹ 34,614 more rows\n\nCodelakers_clean &lt;- lakers_clean |&gt;\n    group_by(date, opponent, period) |&gt;\n    arrange(date, opponent, period, desc(time)) |&gt;\n    mutate(\n        diff_btw_plays_sec = as.numeric(time - lag(time, 1))\n    )\nlakers_clean |&gt; select(date, opponent, time, period, diff_btw_plays_sec)\n\n# A tibble: 34,624 × 5\n# Groups:   date, opponent, period [314]\n   date       opponent time     period diff_btw_plays_sec\n   &lt;date&gt;     &lt;chr&gt;    &lt;Period&gt;  &lt;int&gt;              &lt;dbl&gt;\n 1 2008-10-28 POR      12M 0S        1                 NA\n 2 2008-10-28 POR      11M 39S       1                -21\n 3 2008-10-28 POR      11M 37S       1                 -2\n 4 2008-10-28 POR      11M 25S       1                -12\n 5 2008-10-28 POR      11M 23S       1                 -2\n 6 2008-10-28 POR      11M 22S       1                 -1\n 7 2008-10-28 POR      11M 22S       1                  0\n 8 2008-10-28 POR      11M 22S       1                  0\n 9 2008-10-28 POR      11M 0S        1                -22\n10 2008-10-28 POR      10M 53S       1                 -7\n# ℹ 34,614 more rows\n\n\nExercises\nExercises will be on HW4.",
+    "crumbs": [
+      "In-Class Activities",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>6 Adv Data wrangling P1</span>"
+    ]
+  },
+  {
+    "objectID": "src/ica/ICA5.html#factors",
+    "href": "src/ica/ICA5.html#factors",
+    "title": "6 Adv Data wrangling P1",
+    "section": "Factors",
+    "text": "Factors\nNotes\nCreating factors\nIn R, factors are made up of two components: the actual values of the data and the possible levels within the factor. Creating a factor requires supplying both pieces of information.\n\nCodemonths &lt;- c(\"Mar\", \"Dec\", \"Jan\",  \"Apr\", \"Jul\")\n\n\nHowever, if we were to sort this vector, R would sort this vector alphabetically.\n\nCode# alphabetical sort\nsort(months)\n\n[1] \"Apr\" \"Dec\" \"Jan\" \"Jul\" \"Mar\"\n\n\nWe can fix this sorting by creating a factor version of months. The levels argument is a character vector that specifies the unique values that the factor can take. The order of the values in levels defines the sorting of the factor.\n\nCodemonths_fct &lt;- factor(months, levels = month.abb) # month.abb is a built-in variable\nmonths_fct\n\n[1] Mar Dec Jan Apr Jul\nLevels: Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec\n\nCodesort(months_fct)\n\n[1] Jan Mar Apr Jul Dec\nLevels: Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec\n\n\nWhat if we try to create a factor with values that aren’t in the levels? (e.g., a typo in a month name)\n\nCodemonths2 &lt;- c(\"Jna\", \"Mar\")\nfactor(months2, levels = month.abb)\n\n[1] &lt;NA&gt; Mar \nLevels: Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec\n\n\nBecause the NA is introduced silently (without any error or warnings), this can be dangerous. It might be better to use the fct() function in the forcats package instead:\n\nCodefct(months2, levels = month.abb)\n\nError in `fct()`:\n! All values of `x` must appear in `levels` or `na`\nℹ Missing level: \"Jna\"\n\n\nReordering factors\nWe’ll use a subset of the General Social Survey (GSS) dataset available in the forcats pacakges.\n\nCodedata(gss_cat)\nhead(gss_cat)\n\n# A tibble: 6 × 9\n   year marital         age race  rincome        partyid     relig denom tvhours\n  &lt;int&gt; &lt;fct&gt;         &lt;int&gt; &lt;fct&gt; &lt;fct&gt;          &lt;fct&gt;       &lt;fct&gt; &lt;fct&gt;   &lt;int&gt;\n1  2000 Never married    26 White $8000 to 9999  Ind,near r… Prot… Sout…      12\n2  2000 Divorced         48 White $8000 to 9999  Not str re… Prot… Bapt…      NA\n3  2000 Widowed          67 White Not applicable Independent Prot… No d…       2\n4  2000 Never married    39 White Not applicable Ind,near r… Orth… Not …       4\n5  2000 Divorced         25 White Not applicable Not str de… None  Not …       1\n6  2000 Married          25 White $20000 - 24999 Strong dem… Prot… Sout…      NA\n\n\nReordering the levels of a factor can be useful in plotting when categories would benefit from being sorted in a particular way:\n\nCoderelig_summary &lt;- gss_cat |&gt;\n    group_by(relig) |&gt;\n    summarize(\n        tvhours = mean(tvhours, na.rm = TRUE),\n        n = n()\n    )\n\nggplot(relig_summary, aes(x = tvhours, y = relig)) + \n    geom_point() +\n    theme_classic()\n\n\n\n\n\n\n\nWe can use fct_reorder() in forcats.\n\nThe first argument is the factor that you want to reorder the levels of\nThe second argument determines how the factor is sorted (analogous to what you put inside arrange() when sorting the rows of a data frame.)\n\n\nCodeggplot(relig_summary, aes(x = tvhours, y = fct_reorder(relig, tvhours))) +\n    geom_point() +\n    theme_classic()\n\n\n\n\n\n\n\nFor bar plots, we can use fct_infreq() to reorder levels from most to least common. This can be combined with fct_rev() to reverse the order (least to most common):\n\nCodegss_cat |&gt;\n    ggplot(aes(x = marital)) +\n    geom_bar() +\n    theme_classic()\n\n\n\n\n\n\nCodegss_cat |&gt;\n    mutate(marital = marital |&gt; fct_infreq() |&gt; fct_rev()) |&gt;\n    ggplot(aes(x = marital)) +\n    geom_bar() +\n    theme_classic()\n\n\n\n\n\n\n\nModifying factor levels\nWe talked about reordering the levels of a factor–what about changing the values of the levels themselves?\nFor example, the names of the political parties in the GSS could use elaboration (“str” isn’t a great label for “strong”) and clean up:\n\nCodegss_cat |&gt; count(partyid)\n\n# A tibble: 10 × 2\n   partyid                n\n   &lt;fct&gt;              &lt;int&gt;\n 1 No answer            154\n 2 Don't know             1\n 3 Other party          393\n 4 Strong republican   2314\n 5 Not str republican  3032\n 6 Ind,near rep        1791\n 7 Independent         4119\n 8 Ind,near dem        2499\n 9 Not str democrat    3690\n10 Strong democrat     3490\n\n\nWe can use fct_recode() on partyid with the new level names going on the left and the old levels on the right. Any levels that aren’t mentioned explicitly (i.e., “Don’t know” and “Other party”) will be left as is:\n\nCodegss_cat |&gt;\n    mutate(\n        partyid = fct_recode(partyid,\n            \"Republican, strong\"    = \"Strong republican\",\n            \"Republican, weak\"      = \"Not str republican\",\n            \"Independent, near rep\" = \"Ind,near rep\",\n            \"Independent, near dem\" = \"Ind,near dem\",\n            \"Democrat, weak\"        = \"Not str democrat\",\n            \"Democrat, strong\"      = \"Strong democrat\"\n        )\n    ) |&gt;\n    count(partyid)\n\n# A tibble: 10 × 2\n   partyid                   n\n   &lt;fct&gt;                 &lt;int&gt;\n 1 No answer               154\n 2 Don't know                1\n 3 Other party             393\n 4 Republican, strong     2314\n 5 Republican, weak       3032\n 6 Independent, near rep  1791\n 7 Independent            4119\n 8 Independent, near dem  2499\n 9 Democrat, weak         3690\n10 Democrat, strong       3490\n\n\nTo combine groups, we can assign multiple old levels to the same new level (“Other” maps to “No answer”, “Don’t know”, and “Other party”):\n\nCodegss_cat |&gt;\n    mutate(\n        partyid = fct_recode(partyid,\n            \"Republican, strong\"    = \"Strong republican\",\n            \"Republican, weak\"      = \"Not str republican\",\n            \"Independent, near rep\" = \"Ind,near rep\",\n            \"Independent, near dem\" = \"Ind,near dem\",\n            \"Democrat, weak\"        = \"Not str democrat\",\n            \"Democrat, strong\"      = \"Strong democrat\",\n            \"Other\"                 = \"No answer\",\n            \"Other\"                 = \"Don't know\",\n            \"Other\"                 = \"Other party\"\n        )\n    )\n\n# A tibble: 21,483 × 9\n    year marital         age race  rincome        partyid    relig denom tvhours\n   &lt;int&gt; &lt;fct&gt;         &lt;int&gt; &lt;fct&gt; &lt;fct&gt;          &lt;fct&gt;      &lt;fct&gt; &lt;fct&gt;   &lt;int&gt;\n 1  2000 Never married    26 White $8000 to 9999  Independe… Prot… Sout…      12\n 2  2000 Divorced         48 White $8000 to 9999  Republica… Prot… Bapt…      NA\n 3  2000 Widowed          67 White Not applicable Independe… Prot… No d…       2\n 4  2000 Never married    39 White Not applicable Independe… Orth… Not …       4\n 5  2000 Divorced         25 White Not applicable Democrat,… None  Not …       1\n 6  2000 Married          25 White $20000 - 24999 Democrat,… Prot… Sout…      NA\n 7  2000 Never married    36 White $25000 or more Republica… Chri… Not …       3\n 8  2000 Divorced         44 White $7000 to 7999  Independe… Prot… Luth…      NA\n 9  2000 Married          44 White $25000 or more Democrat,… Prot… Other       0\n10  2000 Married          47 White $25000 or more Republica… Prot… Sout…       3\n# ℹ 21,473 more rows\n\n\nWe can use fct_collapse() to collapse many levels:\n\nCodegss_cat |&gt;\n    mutate(\n        partyid = fct_collapse(partyid,\n            \"Other\" = c(\"No answer\", \"Don't know\", \"Other party\"),\n            \"Republican\" = c(\"Strong republican\", \"Not str republican\"),\n            \"Independent\" = c(\"Ind,near rep\", \"Independent\", \"Ind,near dem\"),\n            \"Democrat\" = c(\"Not str democrat\", \"Strong democrat\")\n        )\n    ) |&gt;\n    count(partyid)\n\n# A tibble: 4 × 2\n  partyid         n\n  &lt;fct&gt;       &lt;int&gt;\n1 Other         548\n2 Republican   5346\n3 Independent  8409\n4 Democrat     7180\n\n\nExercises\n\nCreate a factor version of the following data with the levels in a sensible order.\n\n\nCoderatings &lt;- c(\"High\", \"Medium\", \"Low\")\n\n\nMore exercises will be on HW4.",
+    "crumbs": [
+      "In-Class Activities",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>6 Adv Data wrangling P1</span>"
+    ]
+  },
+  {
+    "objectID": "src/ica/ICA5.html#done",
+    "href": "src/ica/ICA5.html#done",
+    "title": "6 Adv Data wrangling P1",
+    "section": "Done!",
+    "text": "Done!\n\nCheck the ICA Instructions for how to (a) push your code to GitHub and (b) update your portfolio website",
+    "crumbs": [
+      "In-Class Activities",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>6 Adv Data wrangling P1</span>"
     ]
   },
   {
