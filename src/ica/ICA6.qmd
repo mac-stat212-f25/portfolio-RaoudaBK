@@ -98,9 +98,6 @@ str_view(string3)
 ```{r ex_create_string}
 # Your code
 r <- "It's Thursday"
-r
-v <- 'It's Thursday'
-v
 ```
 
 
