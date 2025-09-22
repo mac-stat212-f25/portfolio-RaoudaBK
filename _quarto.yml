@@ -71,16 +71,13 @@ book:
       - src/tt/2025-07-08.qmd
       - src/tt/2025-07-15.qmd
       - src/tt/hw01-tt.qmd
-      - src/tt/Homework2/hw02-p1.qmd
-      - src/tt/Homework2/hw02-p2.qmd
 
     - part: "In-Class Activities"
       chapters:
-      - src/ica/ica-sample1.qmd
-      - src/ica/ica-sample2.qmd
       - src/ica/cleaning.qmd
       - src/ica/ICA-3.qmd
       - src/ica/ICA5.qmd
+      - src/ica/ICA6.qmd
 
   appendices:
   - src/appx/appx-sample1.qmd
