@@ -7,7 +7,7 @@
 # Options for html
 # https://quarto.org/docs/reference/projects/websites.html#section
 
-#quarto publish gh-pages --no-browser
+##quarto publish gh-pages --no-browser
 
 project:
   type: book
@@ -78,6 +78,10 @@ book:
       - src/ica/ICA-3.qmd
       - src/ica/ICA5.qmd
       - src/ica/ICA6.qmd
+
+    - part: "Exam Summary Sheet"
+      chapters:
+      - src/Ex/exam1summarysheet.qmd
 
   appendices:
   - src/appx/appx-sample1.qmd

@@ -2,7 +2,6 @@
 title: "7 Adv Data wrangling P2"
 ---
 
-
 ```{r doc_setup_07, echo=FALSE, message=FALSE}
 library(tidyverse) # The stringr package is part of tidyverse
 ```
