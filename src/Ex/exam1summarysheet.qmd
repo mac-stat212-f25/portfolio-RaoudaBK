@@ -1,0 +1,16 @@
+---
+title: "Exam1SummarySheet"
+---
+
+
+```{r}
+library(knitr)
+
+# Path to your image
+include_graphics("/Users/raouda/Documents/GitHub/portfolio-RaoudaBK/src/Ex/Sheet/Recto.png")
+
+include_graphics("/Users/raouda/Documents/GitHub/portfolio-RaoudaBK/src/Ex/Sheet/Verso.png")
+
+```
+
+

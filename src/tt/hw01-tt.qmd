@@ -1,0 +1,64 @@
+---
+title: "Homework 01"
+author: "Raouda Mamane Bello Boubacar"
+date: "2025-09-09"
+---
+
+
+## TidyTuesday Section
+
+Explore the week's [TidyTuesday](https://github.com/rfordatascience/tidytuesday) challenge. Develop a research question, then answer it through a short data story with [effective visualization(s)]({{< var effective-viz-url >}}).  Provide sufficient background for readers to grasp your narrative.
+
+### Data context 
+For this homework I used the rank_by_year dataset from the Henley Passport Index, which measures how many countries a passport holder can enter without a visa. I chose this dataset because passports are mor than just travel documents. They reflect freedom and global mobility. Since I come from a country with a weaker passport, I was especially interested in exploring how access to visa-free travel differs across the world.
+
+```{r}
+# Load my librairies
+library(readr) 
+library(tidyverse)
+```
+
+```{r}
+#load my data
+rank_by_year  <- read_csv("/Users/raouda/Documents/GitHub/portfolio-RaoudaBK/src/tt/Data/rank_by_year.csv")
+```
+
+### Research Question
+My question today is : Which regions of the world have the most access to visa-free countries and how has this changed over time? 
+
+I chose this focus because it allows me to compare regions instead of only looking at one country and helps to reveal inequalities between parts of the world showing where people can travel more freely.
+
+### Data Visualization
+
+```{r}
+# average number of visa-free destinations for each region from 2006 to 2025
+region <- rank_by_year %>%
+  group_by(region, year) %>%
+  summarise(avg_visa_free = mean(visa_free_count, na.rm = TRUE)) %>%
+  ungroup()
+
+# Illustrate the passport streng by region over the past 20 years
+ggplot(region, aes(x = year, y = avg_visa_free, color = region)) +
+  geom_line() +
+  labs(
+    title = "Average Visa-Free Access by Region (2006–2025)",
+    x = "Year",
+    y = "Average Number of Visa-Free Destinations",
+    color = "Region") +
+  theme_minimal()
+
+```
+
+### Data Analysis 
+
+The line chart shows that over the years, the number of visa-free destinations generally increases. From around 2010 to 2025, there is a clear upward trend, although some regions experience occasional fluctuations, with certain years showing increases for some countries and decreases for others. Interestingly, in the dataset I was given, the years 2007 and 2009 show 0 for all countries and regions. I’m not sure if this is because the data wasn’t collected or if there’s another reason, but it’s something I’d like to explore further.
+
+Looking at the overall trends, European countries consistently offer access to more than 150 destinations since 2017, making them the strongest passports. The Americas are generally in second place, followed by the Caribbean in third. However, by the end of 2022, it appears that Oceania’s passport mobility surpasses most Caribbean countries, and this continues until today. In contrast, African countries and the Middle East have much lower visa-free access, with Africa having fewer than 75 destinations even though there has been a slight increase compared to 2010.
+
+
+### Conclusion & reflections
+In conclusion, the data shows that Europe has the strongest passport access, followed by the Americas, with the Caribbean and Oceania showing interesting shifts in mobility over time. Africa and the Middle East continue to have lower visa-free access, highlighting persistent global inequalities in travel freedom. I was somewhat surprised by Asia and that's because while countries like Singapore and Japan have very strong passports, most Asian countries actually have relatively low mobility which I hadn’t expected. The Caribbean being third in mobility today also stood out to me, showing that smaller regions can sometimes have more freedom than larger ones.
+
+The years 2007 and 2009 showing 0 for all regions is still unclear. This might be due to missing data or other factors—but it also makes me think about the importance of understanding data limitations when drawing conclusions.
+
+Overall, this homework helped me see how passport strength varies across regions and over time and it made me more aware of how travel freedom is not evenly distributed globally. In the future I would think about investigating the factors that influence changes in passport power over time, such as political relationships, trade agreements, or major events like the COVID-19 pandemic. It would also be interesting to look closer at the Caribbean and Oceania to understand why their mobility has increased relative to other regions.  
