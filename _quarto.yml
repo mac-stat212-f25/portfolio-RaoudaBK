@@ -79,6 +79,8 @@ book:
       - src/ica/ICA5.qmd
       - src/ica/ICA6.qmd
       - src/ica/ICA8.qmd
+      - src/ica/ICA11.qmd
+
 
     - part: "Exam Summary Sheet"
       chapters:
