@@ -7,6 +7,8 @@
 # Options for html
 # https://quarto.org/docs/reference/projects/websites.html#section
 
+##quarto publish gh-pages --no-browser
+
 project:
   type: book
   output-dir: docs
@@ -22,7 +24,7 @@ number-depth: 2
 
 book:
   title: "COMP/STAT212 Portfolio"
-  author: "Your Name Here"
+  author: "Raouda Mamane Bello Boubacar"
   date: today  # use today to update date published based on last time project was edited
   date-format: full
   # favicon: path/to/favorite-logo.png
@@ -68,11 +70,27 @@ book:
       chapters:
       - src/tt/2025-07-08.qmd
       - src/tt/2025-07-15.qmd
+      - src/tt/hw01-tt.qmd
 
     - part: "In-Class Activities"
       chapters:
-      - src/ica/ica-sample1.qmd
-      - src/ica/ica-sample2.qmd
+      - src/ica/cleaning.qmd
+      - src/ica/ICA-3.qmd
+      - src/ica/ICA4/ICA-4.qmd
+      - src/ica/ICA5.qmd
+      - src/ica/ICA6.qmd
+      - src/ica/ICA7.qmd
+      - src/ica/ICA8.qmd
+      - src/ica/ICA9.qmd
+      - src/ica/ICA12.qmd
+      - src/ica/ICA14.qmd
+      - src/ica/ICA15.qmd
+      - src/ica/ICA16.qmd
+
+
+    - part: "Exam Summary Sheet"
+      chapters:
+      - src/Ex/exam1summarysheet.qmd
 
   appendices:
   - src/appx/appx-sample1.qmd
