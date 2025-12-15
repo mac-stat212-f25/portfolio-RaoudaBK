@@ -1,36 +1,37 @@
 ---
-title: "4 Advanced Spatial Viz P1"
+title: "4 Adv Spatial Viz P1"
 ---
 
-```{r doc_setup, echo=FALSE, message=FALSE}
-#| echo: false
-#| message: false
-
-library(tidyverse)
-knitr::opts_chunk$set(fig.align = "center", warning = FALSE, message = FALSE)
-```
 
 ## 🧩 Learning Goals
 
 By the end of this lesson, you should be able to:
 
--   Understand the basics of a CRS (coordinate reference system)
--   Understand and recognize different spatial file types and data types in R
--   Implement some of the basic plotting with the `sf` package
--   Understand foundational ideas in working with spatial data (aggregating spatial point data to a spatial region, joining spatial data sets)
+- Understand the basics of a CRS (coordinate reference system)
+- Understand and recognize different spatial file types and data types in R
+- Implement some of the basic plotting with the `sf` package
+- Understand foundation ideas in working with spatial data (aggregating spatial point data to a spatial region, joining spatial data sets)
+
+
+
 
 ## Additional Resources
 
--   Spatial Data Science with Applications in R book: [web](https://r-spatial.org/book/)
--   Spatial Data Science with R and `terra` Resources: [web](https://rspatial.org/)
--   Leaflet in R Package: [web](https://rstudio.github.io/leaflet/)
--   CRAN task view on spatial analysis: [web](https://cran.r-project.org/web/views/Spatial.html)
+- Spatial Data Science with Applications in R book: [web](https://r-spatial.org/book/)
+- Spatial Data Science with R and `terra` Resources: [web]( https://rspatial.org/)
+- Leaflet in R Package: [web](https://rstudio.github.io/leaflet/)
+- CRAN task view on spatial analysis: [web](https://cran.r-project.org/web/views/Spatial.html)
+
+
+
+
 
 ## Setup
 
 For this activity, create the following directory structure in your portfolio repository under `src/ica` folder:
 
-``` markdown
+
+```markdown
 portfolio
 └─ src
    └─ ica
@@ -61,39 +62,43 @@ library(terra)
 library(stars)
 library(tidycensus) # spatial data for the US with census information
 library(USAboundaries) # access to boundaries for US states, counties, zip codes, and congressional districts 
+
 ```
+
 
 ## Spatial Data in R
 
 See [Spatial Data Appendix](https://hash-mac.github.io/stat212site-f25/notes/spatial-data.html) for basics of CRS and spatial data types.
 
+
 ### Download Shapefiles
 
-1.  Navigate to the following URLs to download the spatial data files we'll be using in this activity. Put these files in the `data` folder of your `04_adv_maps` folder.
+1. Navigate to the following URLs to download the spatial data files we'll be using in this activity. Put these files in the `data` folder of your `04_adv_maps` folder.
+  
+- MN cities: <https://gisdata.mn.gov/dataset/loc-pop-centers>
+  - File type: shapefile (`.shp`)
+  - File name: `shp_loc_pop_centers.zip` (Unzip this after downloading.)
+  
+- MN water: <https://gisdata.mn.gov/dataset/us-mn-state-metc-water-lakes-rivers>
+  - File type: shapefile (`.shp`)
+  - File name: `shp_water_lakes_rivers.zip` (Unzip this after downloading.)
 
--   MN cities: <https://gisdata.mn.gov/dataset/loc-pop-centers>
-    -   File type: shapefile (`.shp`)
-    -   File name: `shp_loc_pop_centers.zip` (Unzip this after downloading.)
--   MN water: <https://gisdata.mn.gov/dataset/us-mn-state-metc-water-lakes-rivers>
-    -   File type: shapefile (`.shp`)
-    -   File name: `shp_water_lakes_rivers.zip` (Unzip this after downloading.)
+
 
 ### Read in Files
 
-2.  Read in the MN cities and MN water shapefiles by entering the correct relative paths in `st_read()`. **Tab completion will be very helpful here: type part of a directory or file name and hit tab to autocomplete or bring up a dropdown of options.**
+2. Read in the MN cities and MN water shapefiles by entering the correct relative paths in `st_read()`. **Tab completion will be very helpful here: type part of a directory or file name and hit tab to autocomplete or bring up a dropdown of options.**
 
 ```{r reading}
 # The sf package comes with a North Carolina shapefile:
 nc <- st_read(system.file("shape/nc.shp", package = "sf"))
 
 # Read in shapefiles just downloaded
-mn_cities <- st_read("/Users/raouda/Documents/GitHub/portfolio-RaoudaBK/src/ica/ICA4/shp_loc_pop_centers/city_and_township_population_centers.shp")
-mn_water <- st_read("/Users/raouda/Documents/GitHub/portfolio-RaoudaBK/src/ica/ICA4/shp_water_lakes_rivers/LakesAndRivers.shp")
+mn_cities <- st_read("/Users/raouda/Documents/GitHub/portfolio-RaoudaBK/data/processed/shp_loc_pop_centers/city_and_township_population_centers.shp")
+mn_water <- st_read("/Users/raouda/Documents/GitHub/portfolio-RaoudaBK/data/processed/shp_water_lakes_rivers/LakesAndRivers.shp")
 ```
 
-The `sf` package reads in spatial data in `data.frame`-like format.
-Using the `class()` function we can check the **class** (type) of object that we just read in.
-Note the presence of the "sf" and "data.frame" classes:
+The `sf` package reads in spatial data in `data.frame`-like format. Using the `class()` function we can check the **class** (type) of object that we just read in. Note the presence of the "sf" and "data.frame" classes:
 
 ```{r check_class_sf}
 class(nc)
@@ -101,8 +106,10 @@ class(mn_cities)
 class(mn_water)
 ```
 
-When we read in spatial objects, it is useful to check what CRS underlies the data.
-We can do that with `st_crs()` from the `sf` package:
+
+
+
+When we read in spatial objects, it is useful to check what CRS underlies the data. We can do that with `st_crs()` from the `sf` package:
 
 ```{r check_nc_crs}
 st_crs(nc)
@@ -117,9 +124,10 @@ ggplot(nc) +
     labs(title = "NAD27")
 ```
 
+
 ### Change CRS
 
-3.  Let's explore how changing the CRS changes the map. The `st_transform()` function in `sf` re-expresses a spatial object using a user-supplied CRS. The `crs` argument takes a string descriptor of the CRS. We can find these descriptors via <https://epsg.io>. In the example below, I searched for "South Carolina".
+3. Let's explore how changing the CRS changes the map. The `st_transform()` function in `sf` re-expresses a spatial object using a user-supplied CRS. The `crs` argument takes a string descriptor of the CRS. We can find these descriptors via <https://epsg.io>. In the example below, I searched for "South Carolina".
 
 ```{r transform_nc}
 nc_transformed <- nc |> st_transform(crs = "EPSG:32133")
@@ -133,10 +141,10 @@ The goal is to use <https://epsg.io> to **find two CRSs** that result in a North
 
 Take a look at the **function** below that re-maps a spatial object using a new CRS.
 
--   Read through the function to get a sense for how this code works.
--   `spatial_obj` and `new_crs` are called **arguments** (function **inputs**).
-    -   Add one more argument called `title` to this function. Use this input to set the plot title.
--   Use your function to make two new maps using your chosen CRSs.
+- Read through the function to get a sense for how this code works.
+- `spatial_obj` and `new_crs` are called **arguments** (function **inputs**).
+    - Add one more argument called `title` to this function. Use this input to set the plot title.
+- Use your function to make two new maps using your chosen CRSs.
 
 ```{r transform_via_function}
 transform_and_plot <- function(spatial_obj, new_crs) {
@@ -150,13 +158,25 @@ transform_and_plot <- function(spatial_obj, new_crs) {
 # Example usage of this function (using a South Carolina CRS)
 transform_and_plot(nc, new_crs = "EPSG:32133")
 
-# 
+nc <- st_read(system.file("shape/nc.shp", package = "sf"))
+transform_and_plot <- function(spatial_obj, new_crs, title) {
+    spatial_obj |> 
+        st_transform(crs = new_crs) |> 
+        ggplot() +
+            geom_sf() +
+            labs(title = title) +
+            theme_classic()
+}
 
-transform_and_plot(nc, new_crs = "EPSG:4206")
-
+ggplot(nc) +
+    geom_sf() +
+    theme_classic() +
+    labs(title = "NAD27 (Original)")
+transform_and_plot(nc, new_crs = "EPSG:3112", title = "Australia (GDA94)")
 ```
 
 **Verify your understanding:** If you had point location data that was not in the NAD27 CRS, what would you expect about the accuracy of how they would be overlaid on the original North Carolina map?
+
 
 ## MN Map with Multiple Layers
 
@@ -164,7 +184,7 @@ transform_and_plot(nc, new_crs = "EPSG:4206")
 
 ### Get County Boundaries
 
-4.  We've already read in city location and water information from external shapefiles. We can access county boundaries with the `us_counties()` function in the `USAboundaries` package.
+4. We've already read in city location and water information from external shapefiles. We can access county boundaries with the `us_counties()` function in the `USAboundaries` package.
 
 ```{r read_county_data}
 # Load country boundaries data as sf object
@@ -175,34 +195,49 @@ names_counties <- names(mn_counties)
 names(mn_counties)[names_counties == "state_name"] <- c("state_name1", "state_name2")
 ```
 
+
 ### Unifying CRSs Across Different Spatial Datasets
 
-5.  We first need to ensure that the CRS is the same for all spatial datasets.
+5. We first need to ensure that the CRS is the same for all spatial datasets.
 
--   Check the CRS for the `mn_cities`, `mn_water`, and `mn_counties` datasets.
--   If the datasets don't all have the same CRS, use `st_transform()` to update the datasets to have the same CRS as `mn_cities`. You can use `crs = st_crs(mn_cities)` within `st_transform()`.
+- Check the CRS for the `mn_cities`, `mn_water`, and `mn_counties` datasets.
+- If the datasets don't all have the same CRS, use `st_transform()` to update the datasets to have the same CRS as `mn_cities`. You can use `crs = st_crs(mn_cities)` within `st_transform()`.
 
 ```{r}
+# Check CRSs
+st_crs(mn_cities)
+st_crs(mn_water)
+st_crs(mn_counties) # mn_counties is different!
+# Transform the CRS of county data to the more local CRS of the cities
+mn_counties <- mn_counties |>
+    st_transform(crs = st_crs(mn_cities))
 
+# Check the new CRS for mn_counties
+st_crs(mn_counties)
 
 ```
+
 
 ### Counties + Cities
 
-6.  Create a map where city locations are overlaid on a map of county boundaries.
+6. Create a map where city locations are overlaid on a map of county boundaries.
 
--   You will need to call `geom_sf()` twice.
--   Make the map background white.
--   Install the `ggthemes` package, and add the following layer to use a clean map theme: `+ ggthemes::theme_map()`
+- You will need to call `geom_sf()` twice.
+- Make the map background white.
+- Install the `ggthemes` package, and add the following layer to use a clean map theme: `+ ggthemes::theme_map()`
 
 ```{r}
-
-
+ggplot() + 
+    geom_sf(data = mn_counties, fill = "white") + 
+    geom_sf(data = mn_cities, size = 0.5) + 
+    ggthemes::theme_map()
 ```
+
+
 
 ### Customize Colors
 
-7.  We can use traditional `ggplot2` aesthetics (e.g., `fill`, `color`) to display location specific attributes. Below we only plot large cities, and we color and size cities according to their population.
+7. We can use traditional `ggplot2` aesthetics (e.g., `fill`, `color`) to display location specific attributes. Below we only plot large cities, and we color and size cities according to their population.
 
 ```{r mn_map_add_color}
 ggplot() +
@@ -216,18 +251,20 @@ ggplot() +
 
 Look up the `scale_color_viridis_c()` documentation via the [ggplot2 reference](https://ggplot2.tidyverse.org/reference/scale_viridis.html).
 
--   Read the function description at the top. What is the advantage of using this function for making color palettes?
--   Look through the examples section. What is the difference between the `_d()`, `_c()`, and `_b()` variants of this function?
+- Read the function description at the top. What is the advantage of using this function for making color palettes?
+- Look through the examples section. What is the difference between the `_d()`, `_c()`, and `_b()` variants of this function?
+
+
+
 
 ### Adding Elevation Raster Data
 
-Where are large cities located?
-Is there some relationship to local geography/terrain?
+Where are large cities located? Is there some relationship to local geography/terrain? 
 
-8.  To investigate these questions, we can obtain elevation data to include on the map using the `elevatr` package. We encounter two new functions here---we can look up their documentation to make sense of the code by entering the following in the Console:
+8. To investigate these questions, we can obtain elevation data to include on the map using the `elevatr` package. We encounter two new functions here---we can look up their documentation to make sense of the code by entering the following in the Console:
 
--   `?elevatr::get_elev_raster`
--   `?terra::as.data.frame`
+- `?elevatr::get_elev_raster`
+- `?terra::as.data.frame`
 
 ```{r get_elevation_data_zoom_out}
 elevation <- elevatr::get_elev_raster(mn_counties, z = 5, clip = "bbox")
@@ -240,21 +277,17 @@ colnames(elev_df) <- c("x", "y", "elevation")
 
 Build on our existing map by adding a raster layer for elevation as the background.
 
--   Look up the documentation for `geom_raster()` to plot the elevation data from `elev_df`. This will be the first layer of the plot.
--   Look at the documentation for `scale_fill_gradient()` to add the following elevation color scale: `"darkgreen"` represents the lowest elevations, and `"white"` represents the highest elevations.
--   Add in the layers from the map above to show the largest cities and the county outlines. To remove a background color, use `fill = NA`.
+- Look up the documentation for `geom_raster()` to plot the elevation data from `elev_df`. This will be the first layer of the plot.
+- Look at the documentation for `scale_fill_gradient()` to add the following elevation color scale: `"darkgreen"` represents the lowest elevations, and `"white"` represents the highest elevations.
+- Add in the layers from the map above to show the largest cities and the county outlines. To remove a background color, use `fill = NA`.
 
-```{r}
-
-
-```
 
 ### Zoom in to Twin Cities and Add Water
 
-9.  The bulk of the interesting information in this map is in the Twin Cities area. Let's zoom in to this area.
+9. The bulk of the interesting information in this map is in the Twin Cities area. Let's zoom in to this area.
 
--   We can use the `st_bbox()` function to get the **bounding box** for a spatial object---we do this after filtering to the 7 counties in the Twin Cities.
--   We then use `st_crop()` to trim a spatial object to a given bounding box.
+- We can use the `st_bbox()` function to get the **bounding box** for a spatial object---we do this after filtering to the 7 counties in the Twin Cities.
+- We then use `st_crop()` to trim a spatial object to a given bounding box.
 
 ```{r get_elevation_data_zoom_in}
 seven_countyarea <- mn_counties |>
@@ -270,8 +303,7 @@ elev_df <- elevation |> terra::as.data.frame(xy = TRUE)
 colnames(elev_df) <- c("x", "y", "elevation")
 ```
 
-In the plot below, we add a layer for water information and a `coord_sf()` layer to restrict the x and y-axis limits to the Twin Cities bounding box.
-(Without this layer, the map would zoom back out to show all counties and bodies of water).
+In the plot below, we add a layer for water information and a `coord_sf()` layer to restrict the x and y-axis limits to the Twin Cities bounding box. (Without this layer, the map would zoom back out to show all counties and bodies of water).
 
 ```{r elevation_map_zoom_in}
 ggplot() +
@@ -287,16 +319,14 @@ ggplot() +
     theme(legend.position = "none") # remove legend
 ```
 
-Let's add to the above code chunk to save the map above to an image file called `tc_map_zoom.png` in the `figures` folder.
-The code example below shows a general template for saving a plot to file.
-Choose a reasonable width and height.
-(There are also `jpeg()` and `pdf()` functions for writing images.)
+Let's add to the above code chunk to save the map above to an image file called `tc_map_zoom.png` in the `figures` folder. The code example below shows a general template for saving a plot to file. Choose a reasonable width and height. (There are also `jpeg()` and `pdf()` functions for writing images.)
 
 ```{r save_plot_example, eval=FALSE}
 png("relative path to image", width = width_in_pixels, height = height_in_pixels)
 # Code for creating plot
 dev.off()
 ```
+
 
 ## Going Beyond - Twin Cities Map with `leaflet`
 
@@ -324,6 +354,8 @@ mn_counties_leaf |>
     addCircles(data = mn_cities_leaf |> filter(County %in% paste(c("Anoka", "Hennepin", "Ramsey", "Dakota", "Carver", "Washington", "Scott"), "County")), color = "#444444")
 ```
 
+
 ## Done!
 
--   Check the ICA Instructions for how to (a) push your code to GitHub and (b) update your portfolio website
+- Check the ICA Instructions for how to (a) push your code to GitHub and (b) update your portfolio website
+

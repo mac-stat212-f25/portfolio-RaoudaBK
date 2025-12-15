@@ -76,10 +76,16 @@ book:
       chapters:
       - src/ica/cleaning.qmd
       - src/ica/ICA-3.qmd
+      - src/ica/ICA4/ICA-4.qmd
       - src/ica/ICA5.qmd
       - src/ica/ICA6.qmd
+      - src/ica/ICA7.qmd
       - src/ica/ICA8.qmd
-      - src/ica/ICA11.qmd
+      - src/ica/ICA9.qmd
+      - src/ica/ICA12.qmd
+      - src/ica/ICA14.qmd
+      - src/ica/ICA15.qmd
+      - src/ica/ICA16.qmd
 
 
     - part: "Exam Summary Sheet"

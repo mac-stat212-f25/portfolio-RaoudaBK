@@ -2,4 +2,83 @@
 title: "Professional Viz Sample"
 ---
 
-Add content here
+```{r}
+library(tidyverse)
+library(gapminder)
+library(plotly)
+library(scales)
+```
+```{r}
+head(gapminder)
+str(gapminder)
+```
+
+```{r}
+df <- gapminder %>%
+  filter(year %in% c(1992, 2002, 2007))
+
+nrow(df)
+```
+
+
+```{r}
+# Visualization
+p <- plot_ly(
+  data = df,
+  x = ~gdpPercap,
+  y = ~lifeExp,
+  color = ~continent,
+  size = ~pop,
+  sizes = c(6, 50),
+  frame = ~year,      
+  type = "scatter",
+  mode = "markers",
+  text = ~paste(
+    "Country:", country,
+    "<br>Year:", year,
+    "<br>Life Expectancy:", round(lifeExp, 1), "years",
+    "<br>GDP per Capita:", dollar(round(gdpPercap, 0)),
+    "<br>Population:", comma(pop)
+  ),
+  hoverinfo = "text"
+) %>%
+  layout(
+    title = list(
+      text = "As Countries Grow Richer, Life Expectancy Rises",
+      x = 0.05
+    ),
+    xaxis = list(
+      title = "GDP per Capita (log scale)",
+      type = "log"
+    ),
+    yaxis = list(
+      title = "Life Expectancy (Years)"
+    ),
+    legend = list(title = list(text = "Continent")),
+    updatemenus = list(
+      list(
+        type = "buttons",
+        showactive = FALSE,
+        x = 0.05,
+        y = 0,
+        buttons = list(
+          list(
+            label = "Play",
+            method = "animate",
+            args = list(NULL, list(frame = list(duration = 600), redraw = FALSE))
+          ),
+          list(
+            label = "Pause",
+            method = "animate",
+            args = list(NULL, list(mode = "immediate", frame = list(duration = 0)))
+          )
+        )
+      )
+    )
+  )
+
+# Display
+p
+
+```
+
